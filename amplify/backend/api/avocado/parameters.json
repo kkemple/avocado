@@ -1,0 +1,11 @@
+{
+    "AppSyncApiName": "avocado",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": "false",
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authavocado11f8c8ff",
+            "Outputs.UserPoolId"
+        ]
+    }
+}

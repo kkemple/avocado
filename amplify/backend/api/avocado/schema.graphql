@@ -1,0 +1,56 @@
+type Event @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  title: String!
+  dates: DateRange!
+  venue: Location!
+  weather: [Weather] @function(name: "AvocadoEventWeather-${env}")
+  hotel: Location
+  twitter: String
+  website: String
+  tickets: String
+  tasks: [Task] @connection(name: "EventTasks", sortField: "createdAt")
+  contacts: [String]
+  createdAt: String
+  updatedAt: String
+}
+
+type Task @model @auth(rules: [{ allow: owner }]) {
+  id: ID!
+  title: String!
+  completed: Boolean!
+  event: Event @connection(name: "EventTasks", sortField: "createdAt")
+  due: String
+  createdAt: String
+  updatedAt: String
+}
+
+type DateRange {
+  start: String!
+  end: String!
+}
+
+type Location {
+  icon: String!
+  address: String!
+  googleMapsUrl: String!
+  location: LocationLatLng!
+  name: String
+}
+
+type LocationLatLng {
+  lat: Float!
+  lng: Float!
+}
+
+type Weather {
+  temp: Int!
+  icon: WeatherIcon!
+}
+
+enum WeatherIcon {
+  SUNNY
+  RAINY
+  CLOUDY
+  SNOWY
+  WINDY
+}

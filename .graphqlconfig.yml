@@ -1,0 +1,12 @@
+projects:
+  avocado:
+    schemaPath: amplify/backend/api/avocado/build/schema.graphql
+    includes:
+      - graphql/**/*.js
+    excludes:
+      - ./amplify/**
+    extensions:
+      amplify:
+        codeGenTarget: javascript
+        generatedFileName: ''
+        docsFilePath: src/graphql

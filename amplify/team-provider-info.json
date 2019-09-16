@@ -1,0 +1,19 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "avocado-dev-20190914201102-authRole",
+            "UnauthRoleArn": "arn:aws:iam::781155362072:role/avocado-dev-20190914201102-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::781155362072:role/avocado-dev-20190914201102-authRole",
+            "Region": "us-east-1",
+            "DeploymentBucketName": "avocado-dev-20190914201102-deployment",
+            "UnauthRoleName": "avocado-dev-20190914201102-unauthRole",
+            "StackName": "avocado-dev-20190914201102",
+            "StackId": "arn:aws:cloudformation:us-east-1:781155362072:stack/avocado-dev-20190914201102/4d9a6b10-d74d-11e9-905e-0ab6cdd0d422"
+        },
+        "categories": {
+            "auth": {
+                "avocado11f8c8ff": {}
+            }
+        }
+    }
+}

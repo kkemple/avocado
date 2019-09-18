@@ -6,20 +6,25 @@ import parse from "date-fns/parse";
 import format from "date-fns/format";
 import formatDistance from "date-fns/formatDistance";
 
-import Colors from "../../constants/Colors";
+import Colors from "../constants/Colors";
 import ActionBar from "./ActionBar";
 import Contacts from "./Contacts";
 import Map from "./Map";
-import Weather from "../Weather";
+import Weather from "./Weather";
 import Tasks from "./Tasks";
-import { onUpdateEvent, onUpdateTask } from "../../graphql/subscriptions";
+import {
+  onUpdateEvent,
+  onUpdateTask,
+  onCreateTask,
+  onDeleteTask
+} from "../graphql/subscriptions";
 
 const EventCard = styled.View`
   background-color: ${Colors.foreground};
-  margin: 16px 24px;
+  margin: 0 24px 24px;
   flex: 1;
   border-radius: 4px;
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
 `;
 
 const EventTitle = styled.Text`
@@ -124,13 +129,75 @@ export default props => {
     return () => subscription.unsubscribe();
   }, [user, setUser, event, setEvent]);
 
+  useEffect(() => {
+    if (!user || !event) return;
+
+    const subscription = API.graphql(
+      graphqlOperation(onCreateTask, {
+        owner: user.username
+      })
+    ).subscribe({
+      next: ({
+        value: {
+          data: { onCreateTask: createdTask }
+        }
+      }) => {
+        if (createdTask.event.id === event.id) {
+          const sortedTasks = [...event.tasks.items, createdTask].sort(
+            (a, b) => {
+              if (a.due > b.due) return 1;
+              if (a.due < b.due) return -1;
+              return 0;
+            }
+          );
+
+          setEvent({
+            ...event,
+            tasks: { items: sortedTasks }
+          });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [user, setUser, event, setEvent]);
+
+  useEffect(() => {
+    if (!user || !event) return;
+
+    const subscription = API.graphql(
+      graphqlOperation(onDeleteTask, {
+        owner: user.username
+      })
+    ).subscribe({
+      next: ({
+        value: {
+          data: { onDeleteTask: deletedTask }
+        }
+      }) => {
+        if (deletedTask.event.id === event.id) {
+          const updatedTasks = event.tasks.items.filter(
+            task => task.id !== deletedTask.id
+          );
+
+          setEvent({
+            ...event,
+            tasks: { items: updatedTasks }
+          });
+        }
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [user, setUser, event, setEvent]);
+
   const displayDates = getDisplayDates(event.dates.start, event.dates.end);
 
   const displayTimeToEvent = getTimeToEvent(event.dates.start);
 
   return (
     <EventCard>
-      <Summary>
+      <Summary onPress={props.onPress}>
         <EventTitle>{event.title}</EventTitle>
         <EventDatesContainer>
           <EventDates>
@@ -144,7 +211,11 @@ export default props => {
           <Weather forecast={event.weather} />
         </View>
       </Summary>
-      <Contacts contacts={event.contacts} />
+      {!!event.contacts.length && (
+        <View style={{ borderTopColor: Colors.borders, borderTopWidth: 1 }}>
+          <Contacts contacts={event.contacts} />
+        </View>
+      )}
       <Map venue={event.venue} hotel={event.hotel} />
       <Tasks tasks={event.tasks.items} />
       <View

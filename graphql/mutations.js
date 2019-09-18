@@ -9,6 +9,7 @@ export const createEvent = `mutation CreateEvent($input: CreateEventInput!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -63,6 +64,7 @@ export const updateEvent = `mutation UpdateEvent($input: UpdateEventInput!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -117,6 +119,7 @@ export const deleteEvent = `mutation DeleteEvent($input: DeleteEventInput!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -175,6 +178,7 @@ export const createTask = `mutation CreateTask($input: CreateTaskInput!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address
@@ -221,6 +225,7 @@ export const updateTask = `mutation UpdateTask($input: UpdateTaskInput!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address
@@ -267,6 +272,7 @@ export const deleteTask = `mutation DeleteTask($input: DeleteTaskInput!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address

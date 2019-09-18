@@ -12,7 +12,7 @@ import CreateEventScreen from "../screens/CreateEventScreen";
 import TasksScreen from "../screens/TasksScreen";
 import ToolsScreen from "../screens/ToolsScreen";
 import Colors from "../constants/Colors";
-import { MaterialIcons } from "@expo/vector-icons";
+import EventDetailScreen from "../screens/EventDetail";
 
 const config = Platform.select({
   web: { headerMode: "screen" },
@@ -21,18 +21,10 @@ const config = Platform.select({
 
 const HomeStack = createStackNavigator(
   {
-    Home: HomeScreen
+    Home: HomeScreen,
+    EventDetail: EventDetailScreen
   },
   config
-);
-
-const MaterialTabBarIcon = props => (
-  <MaterialIcons
-    name={props.name}
-    size={26}
-    style={{ marginBottom: -3 }}
-    color={props.focused ? Colors.tabIconSelected : Colors.tabIconDefault}
-  />
 );
 
 HomeStack.navigationOptions = {
@@ -47,7 +39,8 @@ HomeStack.path = "";
 const EventsStack = createStackNavigator(
   {
     Events: EventsScreen,
-    CreateEvent: CreateEventScreen
+    CreateEvent: CreateEventScreen,
+    EventDetail: EventDetailScreen
   },
   { ...config, initialRouteName: "Events" }
 );
@@ -95,7 +88,7 @@ const tabNavigator = createBottomTabNavigator(
     ToolsStack
   },
   {
-    initialRouteName: "HomeStack",
+    initialRouteName: "EventsStack",
     tabBarOptions: {
       activeTintColor: Colors.tabIconSelected,
       inactiveTintColor: Colors.tabIconDefault,

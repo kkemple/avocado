@@ -2,13 +2,20 @@ import { AppLoading } from "expo";
 import * as Font from "expo-font";
 import React, { useState, useEffect } from "react";
 import { YellowBox, Platform, StatusBar, StyleSheet, View } from "react-native";
-import { Ionicons } from "@expo/vector-icons";
+import {
+  Ionicons,
+  FontAwesome5,
+  MaterialIcons,
+  MaterialCommunityIcons,
+  Feather
+} from "@expo/vector-icons";
 import Amplify, { Hub } from "aws-amplify";
 import { withAuthenticator, AmplifyTheme } from "aws-amplify-react-native";
 
 YellowBox.ignoreWarnings([
   "Possible Unhandled Promise Rejection",
-  "Remote debugger"
+  "Remote debugger",
+  "ReactNative.NativeModules.LottieAnimationView"
 ]);
 
 import AppNavigator from "./navigation/AppNavigator";
@@ -125,6 +132,10 @@ async function loadResourcesAsync() {
     Font.loadAsync({
       // This is the font that we are using for our tab bar
       ...Ionicons.font,
+      ...FontAwesome5.font,
+      ...MaterialIcons.font,
+      ...MaterialCommunityIcons.font,
+      ...Feather.font,
       // We include SpaceMono because we use it in HomeScreen.js. Feel free to
       // remove this if you are not using it in your app
       "permanent-marker": require("./assets/fonts/PermanentMarker-Regular.ttf"),
@@ -149,6 +160,6 @@ function handleFinishLoading(setLoadingComplete) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff"
+    backgroundColor: Colors.background
   }
 });

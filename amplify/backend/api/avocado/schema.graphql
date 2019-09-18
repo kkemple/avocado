@@ -2,9 +2,10 @@ type Event @model @auth(rules: [{ allow: owner }]) {
   id: ID!
   title: String!
   dates: DateRange!
-  venue: Location!
+  timestamp: String!
+  venue: EventLocation!
   weather: [Weather] @function(name: "AvocadoEventWeather-${env}")
-  hotel: Location
+  hotel: EventLocation
   twitter: String
   website: String
   tickets: String
@@ -35,6 +36,15 @@ type Location {
   googleMapsUrl: String!
   location: LocationLatLng!
   name: String
+}
+
+type EventLocation {
+  icon: String!
+  address: String!
+  googleMapsUrl: String!
+  location: LocationLatLng!
+  name: String
+  nearby: [Location] @function(name: "AvocadoLocationNearbyPlaces-${env}")
 }
 
 type LocationLatLng {

@@ -9,6 +9,7 @@ export const getEvent = `query GetEvent($id: ID!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -68,6 +69,7 @@ export const listEvents = `query ListEvents(
         start
         end
       }
+      timestamp
       venue {
         icon
         address
@@ -96,14 +98,17 @@ export const listEvents = `query ListEvents(
       website
       tickets
       tasks {
-        nextToken
-        items {
-          id
-          title
-          due
-          completed
-        }
+      items {
+        id
+        title
+        completed
+        due
+        createdAt
+        updatedAt
+        owner
       }
+      nextToken
+    }
       contacts
       createdAt
       updatedAt
@@ -125,11 +130,16 @@ export const getTask = `query GetTask($id: ID!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address
         googleMapsUrl
         name
+        location {
+          lat
+          lng
+        }
       }
       weather {
         temp
@@ -140,13 +150,26 @@ export const getTask = `query GetTask($id: ID!) {
         address
         googleMapsUrl
         name
+        location {
+          lat
+          lng
+        }
       }
       twitter
       website
       tickets
       tasks {
-        nextToken
+      items {
+        id
+        title
+        completed
+        due
+        createdAt
+        updatedAt
+        owner
       }
+      nextToken
+    }
       contacts
       createdAt
       updatedAt
@@ -172,6 +195,7 @@ export const listTasks = `query ListTasks(
       event {
         id
         title
+        timestamp
         twitter
         website
         tickets

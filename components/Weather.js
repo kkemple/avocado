@@ -7,7 +7,7 @@ import Colors from "../constants/Colors";
 const ICON_MAP = {
   SUNNY: "sun",
   CLOUDY: "cloud",
-  RAINING: "cloud-drizzle",
+  RAINY: "cloud-drizzle",
   SNOWY: "cloud-snow",
   WINDY: "wind"
 };

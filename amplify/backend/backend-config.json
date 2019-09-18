@@ -28,6 +28,11 @@
 			"service": "Lambda",
 			"providerPlugin": "awscloudformation",
 			"build": true
+		},
+		"AvocadoLocationNearbyPlaces": {
+			"service": "Lambda",
+			"providerPlugin": "awscloudformation",
+			"build": true
 		}
 	}
 }

@@ -1,7 +1,7 @@
 const axios = require("axios");
 const isBefore = require("date-fns/isBefore");
 const addDays = require("date-fns/addDays");
-const getMilliseconds = require("date-fns/getMilliseconds");
+const getUnixTime = require("date-fns/getUnixTime");
 const parse = require("date-fns/parse");
 const startOfDay = require("date-fns/startOfDay");
 const eachDayOfInterval = require("date-fns/eachDayOfInterval");
@@ -33,7 +33,7 @@ const getDatesForForecast = startDate => {
 
   const allDates = eachDayOfInterval({ start, end });
 
-  return allDates.map(date => getMilliseconds(date));
+  return allDates.map(date => getUnixTime(date));
 };
 
 const getForecast = async options => {

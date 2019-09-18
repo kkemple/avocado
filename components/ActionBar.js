@@ -1,10 +1,11 @@
 import React from "react";
 import { Linking, View, TouchableOpacity } from "react-native";
 import { Ionicons, FontAwesome5 } from "@expo/vector-icons";
+import { Icon } from "react-native-elements";
 import parse from "date-fns/parse";
 import formatDistance from "date-fns/formatDistance";
 
-import Colors from "../../constants/Colors";
+import Colors from "../constants/Colors";
 
 const twitterShareURL = "https://mobile.twitter.com/intent/tweet/?text=";
 
@@ -27,9 +28,27 @@ export default props => (
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "stretch",
-      paddingVertical: 16
+      paddingVertical: props.showEditButton ? 0 : 16
     }}
   >
+    {props.showEditButton && (
+      <TouchableOpacity
+        style={{
+          flex: 1,
+          alignItems: "center",
+          justifyContent: "center"
+        }}
+        onPress={props.onPress}
+      >
+        <Icon
+          size={16}
+          type="feather"
+          name="edit"
+          raised
+          color={Colors.tintColor}
+        />
+      </TouchableOpacity>
+    )}
     <View
       style={{
         flex: 1,

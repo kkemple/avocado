@@ -28,12 +28,12 @@
 				"FunctionName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"AvocadoEventWeather",
+						"AvocadoLocationNearbyPlaces",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"AvocadoEventWeather",
+									"AvocadoLocationNearbyPlaces",
 									"-",
 									{
 										"Ref": "env"
@@ -63,7 +63,7 @@
 				"Timeout": "25",
 				"Code": {
 					"S3Bucket": "avocado-dev-20190914201102-deployment",
-					"S3Key": "amplify-builds/AvocadoEventWeather-49763672633271376f66-build.zip"
+					"S3Key": "amplify-builds/AvocadoLocationNearbyPlaces-4f46736a623334483044-build.zip"
 				}
 			}
 		},
@@ -73,12 +73,12 @@
 				"RoleName": {
 					"Fn::If": [
 						"ShouldNotCreateEnvResources",
-						"avocadoLambdaRolec3ffd90f",
+						"avocadoLambdaRole97969caf",
 						{
 							"Fn::Join": [
 								"",
 								[
-									"avocadoLambdaRolec3ffd90f",
+									"avocadoLambdaRole97969caf",
 									"-",
 									{
 										"Ref": "env"

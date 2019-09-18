@@ -9,6 +9,7 @@ export const onCreateEvent = `subscription OnCreateEvent($owner: String!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -63,6 +64,7 @@ export const onUpdateEvent = `subscription OnUpdateEvent($owner: String!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -117,6 +119,7 @@ export const onDeleteEvent = `subscription OnDeleteEvent($owner: String!) {
       start
       end
     }
+    timestamp
     venue {
       icon
       address
@@ -175,6 +178,7 @@ export const onCreateTask = `subscription OnCreateTask($owner: String!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address
@@ -221,6 +225,7 @@ export const onUpdateTask = `subscription OnUpdateTask($owner: String!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address
@@ -267,6 +272,7 @@ export const onDeleteTask = `subscription OnDeleteTask($owner: String!) {
         start
         end
       }
+      timestamp
       venue {
         icon
         address

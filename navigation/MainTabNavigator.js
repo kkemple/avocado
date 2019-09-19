@@ -88,7 +88,7 @@ const tabNavigator = createBottomTabNavigator(
     ToolsStack
   },
   {
-    initialRouteName: "EventsStack",
+    initialRouteName: "HomeStack",
     tabBarOptions: {
       activeTintColor: Colors.tabIconSelected,
       inactiveTintColor: Colors.tabIconDefault,

@@ -61,16 +61,16 @@ const StyledMapView = styled(MapView)`
 `;
 
 const AddTaskButton = styled.TouchableOpacity`
-  position: absolute;
-  bottom: 24px;
-  right: 24px;
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
+  border-radius: 2px;
+  border-style: dashed;
+  border-color: ${Colors.tintColor};
+  border-width: 1px;
   background-color: ${Colors.foreground};
   justify-content: center;
   align-items: center;
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+  margin: 16px;
+  padding: 16px;
+  flex-direction: row;
 `;
 
 const Location = ({ location, title, onPress }) => {
@@ -84,7 +84,7 @@ const Location = ({ location, title, onPress }) => {
       camera.pitch = 45;
       camera.heading = 0;
       camera.altitude = 350;
-      camera.zoom = 3.5;
+      camera.zoom = 17;
 
       mapView.current.animateCamera(camera, { duration: 400 });
     };
@@ -93,15 +93,18 @@ const Location = ({ location, title, onPress }) => {
   }, [location]);
 
   return (
-    <TouchableOpacity onPress={onPress}>
+    <View>
       {location ? (
         <StyledMapView
           ref={mapView}
-          style={{ height: 150 }}
+          style={{ height: 175 }}
           zoomControlEnabled={false}
           showsCompass={false}
           showsScale={false}
           showsBuildings={false}
+          scrollEnabled={false}
+          zoomEnabled={false}
+          zoomTapEnabled={false}
           initialCamera={{
             center: {
               latitude: location.location.lat,
@@ -110,7 +113,7 @@ const Location = ({ location, title, onPress }) => {
             pitch: 45,
             heading: 0,
             altitude: 350,
-            zoom: 3.5
+            zoom: 17
           }}
         >
           <Marker
@@ -123,43 +126,70 @@ const Location = ({ location, title, onPress }) => {
           />
         </StyledMapView>
       ) : (
-        <View style={{ height: 150 }} />
+        <View
+          style={{
+            height: 150,
+            padding: 8,
+            margin: 8,
+            borderColor: Colors.tintColor,
+            borderStyle: "dashed",
+            borderRadius: 2,
+            borderWidth: 1
+          }}
+        />
       )}
       <View
         style={{
           position: "absolute",
-          top: 0,
-          bottom: 0,
-          left: 0,
-          right: 0,
-          backgroundColor: "rgba(0,0,0,0.3)"
+          top: 12,
+          left: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: Colors.foreground,
+          borderRadius: 4
         }}
       >
-        <View
+        <Text
           style={{
-            flex: 1,
-            justifyContent: "flex-end",
-            alignItems: "center",
-            borderWidth: 2,
-            borderColor: Colors.foreground,
-            borderStyle: "dashed",
-            borderRadius: 1,
-            margin: 8,
-            padding: 8
+            fontFamily: "permanent-marker",
+            fontSize: 18,
+            paddingHorizontal: 8,
+            paddingVertical: 4,
+            color: Colors.tintColor
           }}
         >
-          <Text
+          {title}
+        </Text>
+      </View>
+
+      <View
+        style={{
+          position: "absolute",
+          bottom: 8,
+          right: 8,
+          flexDirection: "row",
+          alignItems: "center"
+        }}
+      >
+        <TouchableOpacity onPress={onPress}>
+          <View
             style={{
-              fontSize: 18,
-              fontFamily: "permanent-marker",
-              color: Colors.foreground
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center"
             }}
           >
-            {title}
-          </Text>
-        </View>
+            <Icon
+              raised
+              size={24}
+              type="material-community"
+              name="map-search"
+              color={Colors.tintColor}
+            />
+          </View>
+        </TouchableOpacity>
       </View>
-    </TouchableOpacity>
+    </View>
   );
 };
 
@@ -426,7 +456,7 @@ const ActionsInput = ({ showModal, values, onChange, onCancel }) => {
   );
 };
 
-const TasksForm = ({ showModal, onTaskCreated }) => {
+const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
   const [newTask, setNewTask] = useState({});
 
   return (
@@ -438,12 +468,6 @@ const TasksForm = ({ showModal, onTaskCreated }) => {
             padding: 24
           }}
         >
-          <TouchableOpacity
-            style={{ alignSelf: "flex-end", marginBottom: 16 }}
-            onPress={() => setShowPicker(false)}
-          >
-            <Icon size={30} name="close" color={Colors.inactive} />
-          </TouchableOpacity>
           <Input
             placeholder="Task title"
             placeholderTextColor={Colors.inactive}
@@ -454,6 +478,9 @@ const TasksForm = ({ showModal, onTaskCreated }) => {
               }))
             }
             value={newTask.title}
+            containerStyle={{
+              marginTop: "auto"
+            }}
             inputStyle={{
               color: Colors.tintColor,
               fontFamily: "overpass-black",
@@ -499,29 +526,43 @@ const TasksForm = ({ showModal, onTaskCreated }) => {
               textDayHeaderFontFamily: "overpass-black"
             }}
           />
-          <Button
-            onPress={() => {
-              if (!newTask.title) {
-                Alert.alert("Please add a title");
-                return;
-              }
-              if (!newTask.due) {
-                Alert.alert("Please select a due date");
-                return;
-              }
-
-              onTaskCreated(newTask);
-              setNewTask({});
+          <View
+            style={{
+              marginTop: "auto",
+              flexDirection: "row",
+              justifyContent: "flex-end",
+              alignItems: "center"
             }}
-            buttonStyle={{
-              marginTop: 32,
-              backgroundColor: Colors.tintColor
-            }}
-            titleStyle={{
-              fontFamily: "overpass-black"
-            }}
-            title="Done"
-          />
+          >
+            <Button
+              type="clear"
+              title="Cancel"
+              onPress={() => {
+                setNewTask({});
+                onCancel();
+              }}
+              titleStyle={{
+                fontFamily: "overpass-bold",
+                color: Colors.inactive
+              }}
+            />
+            <Button
+              title="Done"
+              onPress={() => {
+                onTaskCreated(newTask);
+                setNewTask({});
+              }}
+              titleStyle={{
+                fontFamily: "overpass-black",
+                color: Colors.foreground
+              }}
+              buttonStyle={{
+                marginLeft: 16,
+                width: 100,
+                backgroundColor: Colors.tintColor
+              }}
+            />
+          </View>
         </View>
       </SafeAreaView>
     </Modal>
@@ -820,21 +861,24 @@ export default function EventDetailScreen({ navigation }) {
             />
           </EventDatesContainer>
         )}
+        {event && (
+          <View
+            style={{
+              borderBottomWidth: 1,
+              borderBottomColor: Colors.borders,
+              paddingHorizontal: -16
+            }}
+          >
+            <Weather forecast={event.weather} />
+          </View>
+        )}
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 96 }}
+          contentContainerStyle={{ paddingBottom: 48 }}
         >
           {event && (
             <View>
-              <View style={{ paddingHorizontal: -16 }}>
-                <Weather forecast={event.weather} />
-              </View>
-              <View
-                style={{
-                  borderTopWidth: 1,
-                  borderTopColor: Colors.borders
-                }}
-              >
+              <View style={{ paddingHorizontal: 8 }}>
                 <Contacts
                   showControls={true}
                   contacts={event.contacts}
@@ -845,30 +889,27 @@ export default function EventDetailScreen({ navigation }) {
                   }}
                 />
               </View>
-              <View>
-                <View
-                  style={
-                    event.hotel ? { marginBottom: 4, flex: 1 } : { flex: 1 }
-                  }
-                >
-                  <Location
-                    onPress={() => setShowVenueModal(true)}
-                    title="Tap to change venue"
-                    location={event.venue}
-                  />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Location
-                    onPress={() => setShowHotelModal(true)}
-                    title="Tap to change hotel"
-                    location={event.hotel}
-                  />
-                </View>
+              <View
+                style={event.hotel ? { marginBottom: 8, flex: 1 } : { flex: 1 }}
+              >
+                <Location
+                  title="Venue"
+                  onPress={() => setShowVenueModal(true)}
+                  location={event.venue}
+                />
+              </View>
+              <View style={{ flex: 1 }}>
+                <Location
+                  title="Hotel"
+                  onPress={() => setShowHotelModal(true)}
+                  location={event.hotel}
+                />
               </View>
               <View
                 style={{
                   borderBottomWidth: 1,
-                  borderBottomColor: Colors.borders
+                  borderBottomColor: Colors.borders,
+                  paddingHorizontal: 8
                 }}
               >
                 <ActionBar
@@ -881,13 +922,21 @@ export default function EventDetailScreen({ navigation }) {
                 {!!event.tasks.items.length && (
                   <Tasks showDeleteButton tasks={event.tasks.items} />
                 )}
+                <AddTaskButton onPress={() => setShowTasksModal(true)}>
+                  <Text
+                    style={{
+                      color: Colors.tintColor,
+                      fontFamily: "overpass-black"
+                    }}
+                  >
+                    Add Task
+                  </Text>
+                  <Feather name="plus" color={Colors.tintColor} size={20} />
+                </AddTaskButton>
               </View>
             </View>
           )}
         </ScrollView>
-        <AddTaskButton onPress={() => setShowTasksModal(true)}>
-          <Feather name="plus" color={Colors.tintColor} size={24} />
-        </AddTaskButton>
         {event && (
           <View>
             <TitleInput
@@ -932,6 +981,7 @@ export default function EventDetailScreen({ navigation }) {
             />
             <TasksForm
               showModal={showTasksModal}
+              onCancel={() => setShowTasksModal(false)}
               onTaskCreated={task => {
                 setShowTasksModal(false);
                 setTouchedData({ task });

@@ -212,8 +212,16 @@ export default props => {
         </View>
       </Summary>
       {!!event.contacts.length && (
-        <View style={{ borderTopColor: Colors.borders, borderTopWidth: 1 }}>
-          <Contacts contacts={event.contacts} />
+        <View
+          style={{
+            minHeight: 50,
+            borderTopColor: Colors.borders,
+            borderTopWidth: 1
+          }}
+        >
+          <View style={{ paddingHorizontal: 16 }}>
+            <Contacts contacts={event.contacts} />
+          </View>
         </View>
       )}
       <Map venue={event.venue} hotel={event.hotel} />

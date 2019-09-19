@@ -48,7 +48,7 @@ export default ({ mapHeight = 200, showControls = true, venue, hotel }) => {
       camera.pitch = 45;
       camera.heading = 0;
       camera.altitude = 350;
-      camera.zoom = 3.5;
+      camera.zoom = 17;
 
       mapView.current.animateCamera(camera, { duration: 400 });
     };
@@ -83,7 +83,7 @@ export default ({ mapHeight = 200, showControls = true, venue, hotel }) => {
           pitch: 45,
           heading: 0,
           altitude: 350,
-          zoom: 3.5
+          zoom: 17
         }}
       >
         <Marker

@@ -152,7 +152,6 @@ export default ({
         flexDirection: "row",
         justifyContent: "flex-start",
         alignItems: "center",
-        paddingHorizontal: 16,
         paddingVertical: 8
       }}
     >

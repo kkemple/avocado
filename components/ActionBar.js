@@ -28,15 +28,16 @@ export default props => (
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "stretch",
-      paddingVertical: props.showEditButton ? 0 : 16
+      paddingVertical: props.showEditButton ? 4 : 12
     }}
   >
     {props.showEditButton && (
       <TouchableOpacity
         style={{
-          flex: 1,
           alignItems: "center",
-          justifyContent: "center"
+          justifyContent: "center",
+          width: 50,
+          flex: 0
         }}
         onPress={props.onPress}
       >

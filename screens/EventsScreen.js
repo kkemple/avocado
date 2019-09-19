@@ -1,5 +1,5 @@
 import React, { memo, useState, useEffect } from "react";
-import { SafeAreaView, View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { Agenda } from "react-native-calendars";
 import styled from "@emotion/native";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -15,6 +15,7 @@ import addMonths from "date-fns/addMonths";
 import getTime from "date-fns/getTime";
 import format from "date-fns/format";
 import LottieView from "lottie-react-native";
+import { SafeAreaView } from "react-navigation";
 
 import Colors from "../constants/Colors";
 import { listEvents } from "../graphql/queries";

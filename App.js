@@ -10,6 +10,7 @@ import {
   Feather
 } from "@expo/vector-icons";
 import Amplify, { Hub } from "aws-amplify";
+import { AmazonAIPredictionsProvider } from "@aws-amplify/predictions";
 import { withAuthenticator, AmplifyTheme } from "aws-amplify-react-native";
 
 YellowBox.ignoreWarnings([
@@ -23,6 +24,7 @@ import amplifyConfig from "./aws-exports";
 import Colors from "./constants/Colors";
 
 Amplify.configure(amplifyConfig);
+Amplify.addPluggable(new AmazonAIPredictionsProvider());
 
 const theme = {
   ...AmplifyTheme,

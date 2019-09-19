@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, SafeAreaView, Alert } from "react-native";
+import { View, Alert } from "react-native";
 import styled from "@emotion/native";
 import { Button, Input } from "react-native-elements";
 import { TabView } from "react-native-tab-view";
@@ -7,6 +7,7 @@ import parse from "date-fns/parse";
 import getTime from "date-fns/getTime";
 import * as Yup from "yup";
 import { API, graphqlOperation } from "aws-amplify";
+import { SafeAreaView } from "react-navigation";
 
 import Tasks from "../components/TasksInput";
 import ContactsPicker from "../components/Contacts";

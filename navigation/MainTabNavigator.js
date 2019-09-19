@@ -9,8 +9,8 @@ import TabBarIcon from "../components/TabBarIcon";
 import HomeScreen from "../screens/HomeScreen";
 import EventsScreen from "../screens/EventsScreen";
 import CreateEventScreen from "../screens/CreateEventScreen";
-import TasksScreen from "../screens/TasksScreen";
-import ToolsScreen from "../screens/ToolsScreen";
+import TranslateScreen from "../screens/TranslateScreen";
+import SettingsScreen from "../screens/SettingsScreen";
 import Colors from "../constants/Colors";
 import EventDetailScreen from "../screens/EventDetail";
 
@@ -52,43 +52,43 @@ EventsStack.navigationOptions = {
 
 EventsStack.path = "";
 
-const TasksStack = createStackNavigator(
+const TranslateStack = createStackNavigator(
   {
-    Tasks: TasksScreen
+    Translate: TranslateScreen
   },
   config
 );
 
-TasksStack.navigationOptions = {
+TranslateStack.navigationOptions = {
   tabBarLabel: "Translate",
   tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="translate" />
 };
 
-TasksStack.path = "";
+TranslateStack.path = "";
 
-const ToolsStack = createStackNavigator(
+const SettingsStack = createStackNavigator(
   {
-    Tools: ToolsScreen
+    Settings: SettingsScreen
   },
   config
 );
 
-ToolsStack.navigationOptions = {
+SettingsStack.navigationOptions = {
   tabBarLabel: "Settings",
   tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="settings" />
 };
 
-ToolsStack.path = "";
+SettingsStack.path = "";
 
 const tabNavigator = createBottomTabNavigator(
   {
     HomeStack,
     EventsStack,
-    TasksStack,
-    ToolsStack
+    TranslateStack,
+    SettingsStack
   },
   {
-    initialRouteName: "HomeStack",
+    initialRouteName: "SettingsStack",
     tabBarOptions: {
       activeTintColor: Colors.tabIconSelected,
       inactiveTintColor: Colors.tabIconDefault,

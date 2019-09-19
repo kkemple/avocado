@@ -123,6 +123,7 @@ export default ({ onDatesSelected, value, required = true, style = {} }) => {
               {getTitle()}
             </Text>
             <Calendar
+              current={dates.length ? dates[0] : ""}
               markingType={"period"}
               onDayPress={day => {
                 if (dates[1]) {

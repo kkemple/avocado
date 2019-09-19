@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { Text, View } from "react-native";
-import { Auth, API, graphqlOperation } from "aws-amplify";
 import styled from "@emotion/native";
 import parse from "date-fns/parse";
 import format from "date-fns/format";
@@ -12,12 +11,7 @@ import Contacts from "./Contacts";
 import Map from "./Map";
 import Weather from "./Weather";
 import Tasks from "./Tasks";
-import {
-  onUpdateEvent,
-  onUpdateTask,
-  onCreateTask,
-  onDeleteTask
-} from "../graphql/subscriptions";
+import useEventConnection from "../hooks/event-connection";
 
 const EventCard = styled.View`
   background-color: ${Colors.foreground};
@@ -65,135 +59,16 @@ const getTimeToEvent = startDate => {
 
 export default props => {
   const [event, setEvent] = useState({ ...props.event });
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then(user => setUser(user))
-      .catch(error => console.log(error));
-  }, []);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onUpdateEvent, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: event => {
-        const updatedEvent = event.value.data.onUpdateEvent;
-
-        if (updatedEvent.id === event.id) {
-          setEvent(updatedEvent);
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
-
-  useEffect(() => {
-    if (!user) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onUpdateTask, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({ value }) => {
-        const updatedTask = value.data.onUpdateTask;
-
-        if (updatedTask.event.id === event.id) {
-          const updatedTasks = event.tasks.items.map(task => {
-            if (task.id === updatedTask.id) {
-              return {
-                id: updatedTask.id,
-                title: updatedTask.title,
-                due: updatedTask.due,
-                completed: updatedTask.completed
-              };
-            }
-
-            return task;
-          });
-
-          setEvent({
-            ...event,
-            tasks: { items: updatedTasks }
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
-
-  useEffect(() => {
-    if (!user || !event) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onCreateTask, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({
-        value: {
-          data: { onCreateTask: createdTask }
-        }
-      }) => {
-        if (createdTask.event.id === event.id) {
-          const sortedTasks = [...event.tasks.items, createdTask].sort(
-            (a, b) => {
-              if (a.due > b.due) return 1;
-              if (a.due < b.due) return -1;
-              return 0;
-            }
-          );
-
-          setEvent({
-            ...event,
-            tasks: { items: sortedTasks }
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
-
-  useEffect(() => {
-    if (!user || !event) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onDeleteTask, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({
-        value: {
-          data: { onDeleteTask: deletedTask }
-        }
-      }) => {
-        if (deletedTask.event.id === event.id) {
-          const updatedTasks = event.tasks.items.filter(
-            task => task.id !== deletedTask.id
-          );
-
-          setEvent({
-            ...event,
-            tasks: { items: updatedTasks }
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
+  const [connectedEvent] = useEventConnection(props.event.id);
 
   const displayDates = getDisplayDates(event.dates.start, event.dates.end);
-
   const displayTimeToEvent = getTimeToEvent(event.dates.start);
+
+  useEffect(() => {
+    if (connectedEvent) {
+      setEvent({ ...connectedEvent });
+    }
+  }, [connectedEvent]);
 
   return (
     <EventCard>
@@ -207,7 +82,7 @@ export default props => {
             </Text>
           </EventDates>
         </EventDatesContainer>
-        <View style={{ paddingHorizontal: -16 }}>
+        <View style={{ marginHorizontal: -16 }}>
           <Weather forecast={event.weather} />
         </View>
       </Summary>

@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { SafeAreaView, ScrollView, StyleSheet, View, Text } from "react-native";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import LottieView from "lottie-react-native";
 import getTime from "date-fns/getTime";
 import startOfDay from "date-fns/startOfDay";
+import { SafeAreaView } from "react-navigation";
 
-import Colors from "../constants/Colors";
+import useColors from "../hooks/colors";
 import EventCard from "../components/EventCard";
 import { listEvents } from "../graphql/queries";
 import { onCreateEvent } from "../graphql/subscriptions";
 
 export default function HomeScreen({ navigation }) {
+  const [Colors] = useColors();
   const [events, setEvents] = useState([]);
   const [sortedEvents, setSortedEvents] = useState([]);
 
@@ -98,6 +100,7 @@ export default function HomeScreen({ navigation }) {
           >
             {sortedEvents.map(event => (
               <EventCard
+                colors={Colors}
                 key={event.id}
                 event={event}
                 onPress={() => {

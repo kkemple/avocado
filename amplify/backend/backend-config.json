@@ -34,5 +34,17 @@
 			"providerPlugin": "awscloudformation",
 			"build": true
 		}
+	},
+	"predictions": {
+		"AvocadoTextTranslator": {
+			"providerPlugin": "awscloudformation",
+			"service": "Translate",
+			"convertType": "translateText"
+		},
+		"AvocadoTextToSpeech": {
+			"providerPlugin": "awscloudformation",
+			"service": "Polly",
+			"convertType": "speechGenerator"
+		}
 	}
 }

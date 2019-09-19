@@ -1,0 +1,14 @@
+{
+    "resourceName": "AvocadoTextTranslator",
+    "convertPolicyName": "translateTextPolicy901efb64",
+    "authRoleName": {
+        "Ref": "AuthRoleName"
+    },
+    "unauthRoleName": {
+        "Ref": "UnauthRoleName"
+    },
+    "convertType": "translateText",
+    "sourceLang": "en",
+    "targetLang": "es",
+    "access": "auth"
+}

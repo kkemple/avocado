@@ -1,7 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
   Alert,
-  SafeAreaView,
   View,
   Text,
   ScrollView,
@@ -11,10 +10,9 @@ import {
 } from "react-native";
 import styled from "@emotion/native";
 import { Button, Icon, Input } from "react-native-elements";
-import { Auth, API, graphqlOperation } from "aws-amplify";
-import parse from "date-fns/parse";
-import format from "date-fns/format";
-import formatDistance from "date-fns/formatDistance";
+import { API, graphqlOperation } from "aws-amplify";
+import { SafeAreaView } from "react-navigation";
+
 import MapView, { Marker } from "react-native-maps";
 import { Feather } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
@@ -26,14 +24,10 @@ import Weather from "../components/Weather";
 import Tasks from "../components/Tasks";
 import DatesPicker from "../components/DatesPicker";
 import LocationPicker from "../components/LocationPicker";
-import { getEvent } from "../graphql/queries";
+
 import { deleteEvent, updateEvent, createTask } from "../graphql/mutations";
-import {
-  onUpdateEvent,
-  onUpdateTask,
-  onCreateTask,
-  onDeleteTask
-} from "../graphql/subscriptions";
+
+import useEventConnection from "../hooks/event-connection";
 
 const Actions = styled.View`
   justify-content: flex-end;
@@ -570,9 +564,9 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
 };
 
 export default function EventDetailScreen({ navigation }) {
-  const title = navigation.getParam("title", "Event");
-  const [event, setEvent] = useState(null);
-  const [user, setUser] = useState(null);
+  const title = navigation.getParam("title");
+  const eventId = navigation.getParam("eventId");
+
   const [showTitleModal, setShowTitleModal] = useState(false);
   const [showVenueModal, setShowVenueModal] = useState(false);
   const [showHotelModal, setShowHotelModal] = useState(false);
@@ -581,172 +575,13 @@ export default function EventDetailScreen({ navigation }) {
   const [updating, setUpdating] = useState(true);
   const [touchedData, setTouchedData] = useState(null);
 
-  useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then(user => setUser(user))
-      .catch(error => console.log(error));
-  }, [setUser]);
+  const [event] = useEventConnection(eventId);
 
   useEffect(() => {
-    const eventId = navigation.getParam("eventId", null);
-
-    const getDisplayDates = (startDate, endDate) => {
-      const start = parse(startDate, "yyyy-MM-dd", new Date());
-      const end = parse(endDate, "yyyy-MM-dd", new Date());
-
-      if (startDate === endDate) {
-        return format(start, "MMM do");
-      }
-
-      return `${format(start, "MMM do")} / ${format(end, "MMM do")}`;
-    };
-
-    const getTimeToEvent = startDate => {
-      const start = parse(startDate, "yyyy-MM-dd", new Date());
-      return formatDistance(new Date(), start);
-    };
-
-    API.graphql(
-      graphqlOperation(getEvent, {
-        id: eventId
-      })
-    )
-      .then(result => {
-        const event = result.data.getEvent;
-        setEvent({
-          ...event,
-          displayDates: getDisplayDates(event.dates.start, event.dates.end),
-          timeToEvent: getTimeToEvent(event.dates.start)
-        });
-        setUpdating(false);
-      })
-      .catch(error => console.log(error));
-  }, [setEvent, setUpdating, navigation]);
-
-  useEffect(() => {
-    if (!user || !event) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onUpdateEvent, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({
-        value: {
-          data: { onUpdateEvent: updatedEvent }
-        }
-      }) => {
-        if (updatedEvent.id === event.id) {
-          setEvent({
-            ...event,
-            ...updatedEvent
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
-
-  useEffect(() => {
-    if (!user || !event) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onUpdateTask, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({
-        value: {
-          data: { onUpdateTask: updatedTask }
-        }
-      }) => {
-        if (updatedTask.event.id === event.id) {
-          const updatedTasks = event.tasks.items.map(task => {
-            if (task.id === updatedTask.id) {
-              return {
-                id: updatedTask.id,
-                title: updatedTask.title,
-                due: updatedTask.due,
-                completed: updatedTask.completed
-              };
-            }
-
-            return task;
-          });
-
-          setEvent({
-            ...event,
-            tasks: { items: updatedTasks }
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
-
-  useEffect(() => {
-    if (!user || !event) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onCreateTask, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({
-        value: {
-          data: { onCreateTask: createdTask }
-        }
-      }) => {
-        if (createdTask.event.id === event.id) {
-          const sortedTasks = [...event.tasks.items, createdTask].sort(
-            (a, b) => {
-              if (a.due > b.due) return 1;
-              if (a.due < b.due) return -1;
-              return 0;
-            }
-          );
-
-          setEvent({
-            ...event,
-            tasks: { items: sortedTasks }
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
-
-  useEffect(() => {
-    if (!user || !event) return;
-
-    const subscription = API.graphql(
-      graphqlOperation(onDeleteTask, {
-        owner: user.username
-      })
-    ).subscribe({
-      next: ({
-        value: {
-          data: { onDeleteTask: deletedTask }
-        }
-      }) => {
-        if (deletedTask.event.id === event.id) {
-          const updatedTasks = event.tasks.items.filter(
-            task => task.id !== deletedTask.id
-          );
-
-          setEvent({
-            ...event,
-            tasks: { items: updatedTasks }
-          });
-        }
-      }
-    });
-
-    return () => subscription.unsubscribe();
-  }, [user, setUser, event, setEvent]);
+    if (event) {
+      setUpdating(false);
+    }
+  }, [event]);
 
   useEffect(() => {
     if (!touchedData) return;
@@ -925,6 +760,8 @@ export default function EventDetailScreen({ navigation }) {
                 <AddTaskButton onPress={() => setShowTasksModal(true)}>
                   <Text
                     style={{
+                      marginBottom: -5,
+                      fontSize: 18,
                       color: Colors.tintColor,
                       fontFamily: "overpass-black"
                     }}

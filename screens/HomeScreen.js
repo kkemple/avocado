@@ -6,13 +6,12 @@ import getTime from "date-fns/getTime";
 import startOfDay from "date-fns/startOfDay";
 import { SafeAreaView } from "react-navigation";
 
-import useColors from "../hooks/colors";
+import Colors from "../constants/Colors";
 import EventCard from "../components/EventCard";
 import { listEvents } from "../graphql/queries";
 import { onCreateEvent } from "../graphql/subscriptions";
 
 export default function HomeScreen({ navigation }) {
-  const [Colors] = useColors();
   const [events, setEvents] = useState([]);
   const [sortedEvents, setSortedEvents] = useState([]);
 

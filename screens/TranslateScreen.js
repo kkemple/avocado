@@ -10,6 +10,7 @@ import {
 import { Input, Icon, ListItem } from "react-native-elements";
 import { Predictions } from "aws-amplify";
 import { SafeAreaView } from "react-navigation";
+import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
 
@@ -83,6 +84,20 @@ const options = {
     voice: "Filiz"
   }
 };
+
+const ListenButton = styled.TouchableOpacity`
+  align-items: center;
+  background-color: ${Colors.grey["0"]};
+  border-radius: 32px;
+  bottom: 8px;
+  box-shadow: 1px 1px 1px ${Colors.shadow};
+  height: 64px;
+  justify-content: center;
+  margin: 8px;
+  position: absolute;
+  right: 16px;
+  width: 64px;
+`;
 
 export default function TranslateScreen() {
   const [showFromLanguagePicker, setShowFromLanguagePicker] = useState(false);
@@ -171,12 +186,13 @@ export default function TranslateScreen() {
               onChangeText={text => setTextToTranslate(text)}
               inputContainerStyle={{
                 padding: 8,
-                borderColor: Colors.primary["200"],
+                borderColor: Colors.primary["500"],
                 borderWidth: 2,
                 borderBottomWidth: 2,
                 borderRadius: 4,
                 height: "100%",
-                alignItems: "flex-start"
+                alignItems: "flex-start",
+                backgroundColor: Colors.primary["100"]
               }}
               inputStyle={{
                 fontSize: 28,
@@ -201,7 +217,7 @@ export default function TranslateScreen() {
                 onPress={() => setShowFromLanguagePicker(true)}
                 style={{
                   flex: 4,
-                  borderWidth: 1,
+                  borderWidth: 2,
                   borderColor: Colors.primary["500"],
                   borderRadius: 4,
                   padding: 8
@@ -219,7 +235,7 @@ export default function TranslateScreen() {
               </TouchableOpacity>
               <View style={{ flex: 1, paddingHorizontal: 8 }}>
                 <Icon
-                  size={24}
+                  size={28}
                   name="arrow-right"
                   type="material-community"
                   color={Colors.primary["500"]}
@@ -229,7 +245,7 @@ export default function TranslateScreen() {
                 onPress={() => setShowToLanguagePicker(true)}
                 style={{
                   flex: 4,
-                  borderWidth: 1,
+                  borderWidth: 2,
                   borderColor: Colors.primary["500"],
                   borderRadius: 4,
                   padding: 8
@@ -251,12 +267,13 @@ export default function TranslateScreen() {
             <View
               style={{
                 padding: 8,
-                borderColor: Colors.primary["200"],
+                borderColor: Colors.primary["500"],
                 borderWidth: 2,
                 borderBottomWidth: 2,
                 borderRadius: 4,
                 height: "100%",
-                alignItems: "flex-start"
+                alignItems: "flex-start",
+                backgroundColor: Colors.primary["100"]
               }}
             >
               <Text
@@ -270,22 +287,14 @@ export default function TranslateScreen() {
                 {translatedText}
               </Text>
             </View>
-            <TouchableOpacity
-              onPress={playAudio}
-              style={{
-                position: "absolute",
-                bottom: 8,
-                right: 16
-              }}
-            >
+            <ListenButton onPress={playAudio}>
               <Icon
-                raised
-                size={24}
+                size={28}
                 name="ear-hearing"
                 type="material-community"
                 color={Colors.primary["500"]}
               />
-            </TouchableOpacity>
+            </ListenButton>
           </View>
         </KeyboardAvoidingView>
         <Modal visible={showFromLanguagePicker} animationType="slide">

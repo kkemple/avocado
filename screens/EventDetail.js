@@ -571,7 +571,7 @@ export default function EventDetailScreen({ navigation }) {
 
   useEffect(() => {
     if (event) {
-      setUpdating(false);
+      // setUpdating(false);
     }
   }, [event]);
 

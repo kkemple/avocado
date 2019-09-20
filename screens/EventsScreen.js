@@ -35,7 +35,7 @@ const AddEventButton = styled.TouchableOpacity`
   background-color: ${Colors.grey["0"]};
   justify-content: center;
   align-items: center;
-  box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
+  box-shadow: 1px 1px 1px ${Colors.shadow};
 `;
 
 const EventTitle = styled.Text`
@@ -84,7 +84,7 @@ const Item = memo(({ item, onPress, isFirstItem }) => (
       marginTop: isFirstItem ? 24 : 16
     }}
   >
-    <TouchableOpacity onPress={onPress}>
+    <TouchableOpacity activeOpacity={0.6} onPress={onPress}>
       <View
         style={{
           backgroundColor: Colors.primary["500"],
@@ -483,6 +483,7 @@ export default function EventsScreen({ navigation }) {
             renderItem={(item, isFirstItem) => (
               <Item
                 isFirstItem={isFirstItem}
+                activeOpacity={0.6}
                 onPress={() =>
                   navigation.navigate("EventDetail", {
                     eventId: item.event.id,
@@ -511,7 +512,10 @@ export default function EventsScreen({ navigation }) {
           />
         )}
       </View>
-      <AddEventButton onPress={() => navigation.navigate("CreateEvent")}>
+      <AddEventButton
+        activeOpacity={0.6}
+        onPress={() => navigation.navigate("CreateEvent")}
+      >
         <FontAwesome5
           name="calendar-plus"
           color={Colors.primary["500"]}

@@ -350,6 +350,7 @@ export default function CreateEventScreen({ navigation }) {
       <View style={{ flex: 1, padding: 24 }}>
         <Header>
           <Button
+            activeOpacity={0.6}
             onPress={() => navigation.goBack()}
             containerStyle={styles.cancelButtonStyles}
             titleStyle={styles.cancelButtonTitleStyles}
@@ -460,6 +461,7 @@ export default function CreateEventScreen({ navigation }) {
           <Actions>
             {navigationState.index !== 0 && (
               <Button
+                activeOpacity={0.6}
                 onPress={() => {
                   setNavigationState(state => ({
                     ...state,
@@ -478,6 +480,7 @@ export default function CreateEventScreen({ navigation }) {
                   ? "solid"
                   : "outline"
               }
+              activeOpacity={0.6}
               onPress={onDoneButtonPressed}
               titleStyle={[
                 styles.doneButtonTitleStyles,

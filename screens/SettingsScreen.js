@@ -4,29 +4,33 @@ import { Button } from "react-native-elements";
 import { SafeAreaView } from "react-navigation";
 import { Auth } from "aws-amplify";
 import { FontAwesome5 } from "@expo/vector-icons";
+import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
+
+const Attribution = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 8px;
+`;
+
+const AttributionText = styled.Text`
+  font-family: "overpass-bold";
+  color: ${Colors.text};
+`;
+
+const AttributionLink = styled.Text`
+  font-family: "overpass-bold";
+  color: ${Colors.primary["500"]};
+`;
 
 export default function Settings() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, padding: 24 }}>
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-            marginBottom: 8
-          }}
-        >
-          <Text
-            style={{
-              fontFamily: "overpass-bold",
-              color: Colors.text
-            }}
-          >
-            Built with{" "}
-          </Text>
+        <Attribution>
+          <AttributionText>Built with </AttributionText>
           <View>
             <FontAwesome5
               style={{ marginBottom: -3 }}
@@ -38,80 +42,23 @@ export default function Settings() {
           <TouchableOpacity
             onPress={() => Linking.openURL("https://aws-amplify.github.io")}
           >
-            <Text
-              style={{
-                fontFamily: "overpass-bold",
-                color: Colors.primary["300"]
-              }}
-            >
-              {" "}
-              Amplify
-            </Text>
+            <AttributionLink> Amplify</AttributionLink>
           </TouchableOpacity>
-        </View>
-
-        <View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              marginBottom: 8
-            }}
+        </Attribution>
+        <Attribution>
+          <AttributionText>A React Native app using with </AttributionText>
+          <TouchableOpacity onPress={() => Linking.openURL("https://expo.io")}>
+            <AttributionLink>Expo</AttributionLink>
+          </TouchableOpacity>
+        </Attribution>
+        <Attribution>
+          <AttributionText>Weather powered by </AttributionText>
+          <TouchableOpacity
+            onPress={() => Linking.openURL("https://darksky.net/poweredby/")}
           >
-            <Text
-              style={{
-                fontFamily: "overpass-bold",
-                color: Colors.text
-              }}
-            >
-              A React Native app using with{" "}
-            </Text>
-            <TouchableOpacity
-              onPress={() => Linking.openURL("https://expo.io")}
-            >
-              <Text
-                style={{
-                  fontFamily: "overpass-bold",
-                  color: Colors.primary["300"]
-                }}
-              >
-                Expo
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-
-        <View>
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Text
-              style={{
-                fontFamily: "overpass-bold",
-                color: Colors.text
-              }}
-            >
-              Weather powered by{" "}
-            </Text>
-            <TouchableOpacity
-              onPress={() => Linking.openURL("https://darksky.net/poweredby/")}
-            >
-              <Text
-                style={{
-                  fontFamily: "overpass-bold",
-                  color: Colors.primary["300"]
-                }}
-              >
-                Dark Sky
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+            <AttributionLink>Dark Sky</AttributionLink>
+          </TouchableOpacity>
+        </Attribution>
         <Button
           onPress={() => {
             Auth.signOut();

@@ -7,7 +7,8 @@ import {
   FontAwesome5,
   MaterialIcons,
   MaterialCommunityIcons,
-  Feather
+  Feather,
+  FontAwesome
 } from "@expo/vector-icons";
 import Amplify, { Hub } from "aws-amplify";
 import { AmazonAIPredictionsProvider } from "@aws-amplify/predictions";
@@ -132,6 +133,7 @@ async function loadResourcesAsync() {
       // This is the font that we are using for our tab bar
       ...Ionicons.font,
       ...FontAwesome5.font,
+      ...FontAwesome.font,
       ...MaterialIcons.font,
       ...MaterialCommunityIcons.font,
       ...Feather.font,

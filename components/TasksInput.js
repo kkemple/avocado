@@ -9,7 +9,9 @@ import {
 } from "react-native";
 import { Button, Icon, Input } from "react-native-elements";
 import { Calendar } from "react-native-calendars";
+import parse from "date-fns/parse";
 import formatDistance from "date-fns/formatDistance";
+import uuid from "uuid/v4";
 
 import Colors from "../constants/Colors";
 
@@ -27,7 +29,7 @@ const TaskTitle = styled.Text`
 `;
 
 const TaskDueDate = styled.Text`
-  color: ${Colors.tintColor};
+  color: ${Colors.primary["500"]};
 `;
 
 export default ({ onTasksCreated = () => {} }) => {
@@ -50,15 +52,25 @@ export default ({ onTasksCreated = () => {} }) => {
     setSortedTasks(sortedTasks);
   }, [tasks, setTasks]);
 
+  const AddTasksButton = styled.TouchableOpacity`
+    align-items: center;
+    align-self: flex-start;
+    background-color: ${Colors.grey["0"]};
+    border-radius: 28px;
+    box-shadow: 1px 1px 1px ${Colors.shadow};
+    height: 52px;
+    justify-content: center;
+    margin-bottom: 16px;
+    margin: 8px;
+    width: 52px;
+  `;
+
   return (
     <View>
       <View>
-        <TouchableOpacity
-          style={{ alignSelf: "flex-start", marginBottom: 16 }}
-          onPress={() => setShowPicker(true)}
-        >
-          <Icon name="add" raised color={Colors.tintColor} />
-        </TouchableOpacity>
+        <AddTasksButton onPress={() => setShowPicker(true)}>
+          <Icon type="feather" name="plus" color={Colors.primary["500"]} />
+        </AddTasksButton>
         {tasks.map(task => {
           const timeTillDue = formatDistance(
             new Date(),
@@ -81,7 +93,11 @@ export default ({ onTasksCreated = () => {} }) => {
                   alignItems: "center"
                 }}
               >
-                <FontAwesome5 name="trash" color={Colors.tintColor} size={20} />
+                <Icon
+                  name="delete"
+                  type="feather"
+                  color={Colors.primary["500"]}
+                />
               </TouchableOpacity>
             </Task>
           );
@@ -112,12 +128,12 @@ export default ({ onTasksCreated = () => {} }) => {
               }
               value={newTask.title}
               inputStyle={{
-                color: Colors.tintColor,
+                color: Colors.primary["500"],
                 fontFamily: "overpass-black",
                 fontSize: 24
               }}
               inputContainerStyle={{
-                borderBottomColor: Colors.tintColor
+                borderBottomColor: Colors.primary["500"]
               }}
             />
             <Text
@@ -141,16 +157,16 @@ export default ({ onTasksCreated = () => {} }) => {
                 }
               }
               theme={{
-                selectedDayBackgroundColor: Colors.tintColor,
-                selectedDayTextColor: Colors.foreground,
-                todayTextColor: Colors.tintColor,
+                selectedDayBackgroundColor: Colors.primary["500"],
+                selectedDayTextColor: Colors.grey["0"],
+                todayTextColor: Colors.primary["500"],
                 dayTextColor: Colors.text,
                 textDisabledColor: Colors.inactive,
-                dotColor: Colors.tintColor,
-                selectedDotColor: Colors.foreground,
-                arrowColor: Colors.tintColor,
+                dotColor: Colors.primary["500"],
+                selectedDotColor: Colors.grey["0"],
+                arrowColor: Colors.primary["500"],
                 monthTextColor: Colors.text,
-                indicatorColor: Colors.tintColor,
+                indicatorColor: Colors.primary["500"],
                 textDayFontFamily: "overpass-black",
                 textMonthFontFamily: "overpass-black",
                 textDayHeaderFontFamily: "overpass-black"
@@ -173,7 +189,7 @@ export default ({ onTasksCreated = () => {} }) => {
               }}
               buttonStyle={{
                 marginTop: 32,
-                backgroundColor: Colors.tintColor
+                backgroundColor: Colors.primary["500"]
               }}
               titleStyle={{
                 fontFamily: "overpass-black"

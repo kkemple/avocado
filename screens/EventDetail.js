@@ -1,46 +1,50 @@
 import React, { useState, useEffect, useRef } from "react";
 import {
-  Alert,
-  View,
-  Text,
-  ScrollView,
-  TouchableOpacity,
   ActivityIndicator,
-  Modal
+  Alert,
+  Image,
+  Modal,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import styled from "@emotion/native";
 import { Button, Icon, Input } from "react-native-elements";
 import { API, graphqlOperation } from "aws-amplify";
 import { SafeAreaView } from "react-navigation";
-
 import MapView, { Marker } from "react-native-maps";
 import { Feather } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
+import Color from "color";
 
-import Colors from "../constants/Colors";
 import ActionBar from "../components/ActionBar";
+import Colors from "../constants/Colors";
 import Contacts from "../components/Contacts";
-import Weather from "../components/Weather";
-import Tasks from "../components/Tasks";
 import DatesPicker from "../components/DatesPicker";
 import LocationPicker from "../components/LocationPicker";
-
+import Tasks from "../components/Tasks";
+import Weather from "../components/Weather";
 import { deleteEvent, updateEvent, createTask } from "../graphql/mutations";
-
 import useEventConnection from "../hooks/event-connection";
 
+const [R, G, B] = Color(Colors.primary["200"])
+  .rgb()
+  .array();
+
 const Actions = styled.View`
-  justify-content: flex-end;
   align-items: center;
   flex-direction: row;
-  padding-vertical: 16px;
+  justify-content: flex-end;
+  padding: 16px;
   width: 100%;
 `;
 
 const Title = styled.Text`
+  color: ${Colors.text};
   font-family: "permanent-marker";
   font-size: 28px;
-  color: ${Colors.text};
 `;
 
 const EventDatesContainer = styled.View`
@@ -50,21 +54,116 @@ const EventDatesContainer = styled.View`
 `;
 
 const StyledMapView = styled(MapView)`
-  background-color: ${Colors.tintColor};
+  background-color: ${Colors.primary["500"]};
   width: 100%;
 `;
 
 const AddTaskButton = styled.TouchableOpacity`
+  align-items: center;
+  background-color: ${Colors.grey["0"]};
+  border-color: ${Colors.primary["500"]};
   border-radius: 2px;
   border-style: dashed;
-  border-color: ${Colors.tintColor};
   border-width: 1px;
-  background-color: ${Colors.foreground};
+  flex-direction: row;
   justify-content: center;
-  align-items: center;
   margin: 16px;
   padding: 16px;
+`;
+
+const ChangeLocationButton = styled.TouchableOpacity`
+  align-items: center;
+  background-color: ${Colors.grey["0"]};
+  border-radius: 28px;
+  box-shadow: 1px 1px 1px ${Colors.shadow};
+  height: 52px;
+  justify-content: center;
+  margin: 8px;
+  width: 52px;
+`;
+
+const CancelButton = styled.TouchableOpacity`
+  margin-left: 16px;
+`;
+
+const TitleContainer = styled.View`
+  justify-content: flex-start;
+  align-items: flex-start;
+  padding-horizontal: 24px;
+`;
+
+const WeatherContainer = styled.View`
+  border-bottom-width: 1px;
+  border-bottom-color: ${Colors.borders};
+  padding-horizontal: -16px;
+`;
+
+const ContactsContainer = styled.View`
+  padding-horizontal: 8px;
+`;
+
+const ActionBarContainer = styled.View`
+  border-bottom-width: 1px;
+  border-bottom-color: ${Colors.borders};
   flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-horizontal: 4px;
+`;
+
+const EditActionsButton = styled.TouchableOpacity`
+  align-items: center;
+  align-self: flex-start;
+  background-color: ${Colors.grey["0"]};
+  border-radius: 20px;
+  box-shadow: 1px 1px 1px ${Colors.shadow};
+  height: 36px;
+  justify-content: center;
+  margin: 8px;
+  margin-left: 16px;
+  width: 36px;
+`;
+
+const LocationTitleContainer = styled.View`
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  flex-direction: row;
+  align-items: center;
+  background-color: rgba(${R}, ${G}, ${B}, 0.5);
+  border-radius: 4px;
+`;
+
+const LocationTitleText = styled.Text`
+  font-family: "permanent-marker";
+  font-size: 18px;
+  padding-horizontal: 8px;
+  padding-vertical: 4px;
+  color: ${Colors.primary["400"]};
+`;
+
+const EmptyLocation = styled.View`
+  height: 150px;
+  padding: 8px;
+  margin: 8px;
+  border-color: ${Colors.primary["500"]};
+  border-style: "dashed";
+  border-radius: 2px;
+  border-width: 1px;
+`;
+
+const AddTaskButtonText = styled.Text`
+  margin-bottom: -5px;
+  font-size: 18px;
+  color: ${Colors.primary["500"]};
+  font-family: "overpass-black";
+`;
+
+const InputActionsContainer = styled.View`
+  margin-top: auto;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
 `;
 
 const Location = ({ location, title, onPress }) => {
@@ -111,50 +210,26 @@ const Location = ({ location, title, onPress }) => {
           }}
         >
           <Marker
+            icon={require("../assets/images/map-marker.png")}
             coordinate={{
               latitude: location.location.lat,
               longitude: location.location.lng
             }}
             title={location.name}
             description={location.address}
-          />
+          >
+            <Image
+              style={{ width: 40, height: 40 }}
+              source={require("../assets/images/map-marker.png")}
+            />
+          </Marker>
         </StyledMapView>
       ) : (
-        <View
-          style={{
-            height: 150,
-            padding: 8,
-            margin: 8,
-            borderColor: Colors.tintColor,
-            borderStyle: "dashed",
-            borderRadius: 2,
-            borderWidth: 1
-          }}
-        />
+        <EmptyLocation />
       )}
-      <View
-        style={{
-          position: "absolute",
-          top: 12,
-          left: 12,
-          flexDirection: "row",
-          alignItems: "center",
-          backgroundColor: Colors.foreground,
-          borderRadius: 4
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: "permanent-marker",
-            fontSize: 18,
-            paddingHorizontal: 8,
-            paddingVertical: 4,
-            color: Colors.tintColor
-          }}
-        >
-          {title}
-        </Text>
-      </View>
+      <LocationTitleContainer>
+        <LocationTitleText>{title}</LocationTitleText>
+      </LocationTitleContainer>
 
       <View
         style={{
@@ -165,23 +240,14 @@ const Location = ({ location, title, onPress }) => {
           alignItems: "center"
         }}
       >
-        <TouchableOpacity onPress={onPress}>
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <Icon
-              raised
-              size={24}
-              type="material-community"
-              name="map-search"
-              color={Colors.tintColor}
-            />
-          </View>
-        </TouchableOpacity>
+        <ChangeLocationButton onPress={onPress}>
+          <Icon
+            size={24}
+            type="material-community"
+            name="map-search"
+            color={Colors.primary["500"]}
+          />
+        </ChangeLocationButton>
       </View>
     </View>
   );
@@ -190,43 +256,28 @@ const Location = ({ location, title, onPress }) => {
 const TitleInput = ({ showModal, value, onChange, onCancel }) => {
   const [title, setTitle] = useState(value);
 
+  const TitleInputContainer = styled.View`
+    flex: 1;
+    padding: 24px;
+    justify-content: center;
+    align-items: stretch;
+    height: 100%;
+  `;
+
   return (
     <Modal visible={showModal} animationType="slide">
       <SafeAreaView style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 1,
-            padding: 24,
-            justifyContent: "center",
-            alignItems: "stretch",
-            height: "100%"
-          }}
-        >
+        <TitleInputContainer>
           <Input
             value={title}
             onChangeText={text => setTitle(text)}
             errorMessage="Required"
-            errorStyle={{ color: Colors.tintColor }}
-            inputContainerStyle={{
-              borderBottomColor: Colors.tintColor
-            }}
-            inputStyle={{
-              fontSize: 24,
-              color: Colors.tintColor,
-              fontFamily: "overpass-bold"
-            }}
-            containerStyle={{
-              marginTop: "auto"
-            }}
+            errorStyle={styles.inputErrorStyle}
+            inputContainerStyle={styles.inputContainerContainerStyle}
+            inputStyle={styles.inputStyle}
+            containerStyle={styles.inputContainerStyle}
           />
-          <View
-            style={{
-              marginTop: "auto",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              alignItems: "center"
-            }}
-          >
+          <InputActionsContainer>
             <Button
               type="clear"
               title="Cancel"
@@ -244,16 +295,16 @@ const TitleInput = ({ showModal, value, onChange, onCancel }) => {
               onPress={() => onChange(title)}
               titleStyle={{
                 fontFamily: "overpass-black",
-                color: Colors.foreground
+                color: Colors.grey["0"]
               }}
               buttonStyle={{
                 marginLeft: 16,
                 width: 100,
-                backgroundColor: Colors.tintColor
+                backgroundColor: Colors.primary["500"]
               }}
             />
-          </View>
-        </View>
+          </InputActionsContainer>
+        </TitleInputContainer>
       </SafeAreaView>
     </Modal>
   );
@@ -288,14 +339,7 @@ const LocationInput = ({
               value={location.address}
             />
           </View>
-          <View
-            style={{
-              marginTop: "auto",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              alignItems: "center"
-            }}
-          >
+          <InputActionsContainer>
             <Button
               type="clear"
               title="Cancel"
@@ -319,15 +363,15 @@ const LocationInput = ({
               }}
               titleStyle={{
                 fontFamily: "overpass-black",
-                color: Colors.foreground
+                color: Colors.grey["0"]
               }}
               buttonStyle={{
                 marginLeft: 16,
                 width: 100,
-                backgroundColor: Colors.tintColor
+                backgroundColor: Colors.primary["500"]
               }}
             />
-          </View>
+          </InputActionsContainer>
         </View>
       </SafeAreaView>
     </Modal>
@@ -355,61 +399,30 @@ const ActionsInput = ({ showModal, values, onChange, onCancel }) => {
             value={twitter}
             onChangeText={text => setTwitter(text)}
             errorMessage="Twitter"
-            errorStyle={{ color: Colors.tintColor }}
-            inputContainerStyle={{
-              borderBottomColor: Colors.tintColor
-            }}
-            inputStyle={{
-              fontSize: 24,
-              color: Colors.tintColor,
-              fontFamily: "overpass-bold"
-            }}
-            containerStyle={{
-              marginTop: "auto"
-            }}
+            errorStyle={styles.inputErrorStyle}
+            inputContainerStyle={styles.inputContainerContainerStyle}
+            inputStyle={styles.inputStyle}
+            containerStyle={styles.inputContainerStyle}
           />
           <Input
             value={website}
             errorMessage="Website"
             onChangeText={text => setWebsite(text.toLowerCase())}
-            errorStyle={{ color: Colors.tintColor }}
-            inputContainerStyle={{
-              borderBottomColor: Colors.tintColor
-            }}
-            inputStyle={{
-              fontSize: 24,
-              color: Colors.tintColor,
-              fontFamily: "overpass-bold"
-            }}
-            containerStyle={{
-              marginTop: 48
-            }}
+            errorStyle={styles.inputErrorStyle}
+            inputContainerStyle={styles.inputContainerContainerStyle}
+            inputStyle={styles.inputStyle}
+            containerStyle={{ marginTop: 48 }}
           />
           <Input
             value={tickets}
             errorMessage="Tickets"
             onChangeText={text => setTickets(text.toLowerCase())}
-            errorStyle={{ color: Colors.tintColor }}
-            inputContainerStyle={{
-              borderBottomColor: Colors.tintColor
-            }}
-            inputStyle={{
-              fontSize: 24,
-              color: Colors.tintColor,
-              fontFamily: "overpass-bold"
-            }}
-            containerStyle={{
-              marginTop: 48
-            }}
+            errorStyle={styles.inputErrorStyle}
+            inputContainerStyle={styles.inputContainerContainerStyle}
+            inputStyle={styles.inputStyle}
+            containerStyle={{ marginTop: 48 }}
           />
-          <View
-            style={{
-              marginTop: "auto",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              alignItems: "center"
-            }}
-          >
+          <InputActionsContainer>
             <Button
               type="clear"
               title="Cancel"
@@ -435,15 +448,15 @@ const ActionsInput = ({ showModal, values, onChange, onCancel }) => {
               }
               titleStyle={{
                 fontFamily: "overpass-black",
-                color: Colors.foreground
+                color: Colors.grey["0"]
               }}
               buttonStyle={{
                 marginLeft: 16,
                 width: 100,
-                backgroundColor: Colors.tintColor
+                backgroundColor: Colors.primary["500"]
               }}
             />
-          </View>
+          </InputActionsContainer>
         </View>
       </SafeAreaView>
     </Modal>
@@ -455,13 +468,8 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
 
   return (
     <Modal animationType="slide" visible={showModal}>
-      <SafeAreaView>
-        <View
-          style={{
-            height: "100%",
-            padding: 24
-          }}
-        >
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={{ flex: 1, padding: 24 }}>
           <Input
             placeholder="Task title"
             placeholderTextColor={Colors.inactive}
@@ -472,17 +480,9 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
               }))
             }
             value={newTask.title}
-            containerStyle={{
-              marginTop: "auto"
-            }}
-            inputStyle={{
-              color: Colors.tintColor,
-              fontFamily: "overpass-black",
-              fontSize: 24
-            }}
-            inputContainerStyle={{
-              borderBottomColor: Colors.tintColor
-            }}
+            containerStyle={styles.inputContainerStyle}
+            inputStyle={styles.inputStyle}
+            inputContainerStyle={styles.inputContainerContainerStyle}
           />
           <Text
             style={{
@@ -505,29 +505,22 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
               }
             }
             theme={{
-              selectedDayBackgroundColor: Colors.tintColor,
-              selectedDayTextColor: Colors.foreground,
-              todayTextColor: Colors.tintColor,
+              selectedDayBackgroundColor: Colors.primary["500"],
+              selectedDayTextColor: Colors.grey["0"],
+              todayTextColor: Colors.primary["500"],
               dayTextColor: Colors.text,
               textDisabledColor: Colors.inactive,
-              dotColor: Colors.tintColor,
-              selectedDotColor: Colors.foreground,
-              arrowColor: Colors.tintColor,
+              dotColor: Colors.primary["500"],
+              selectedDotColor: Colors.grey["0"],
+              arrowColor: Colors.primary["500"],
               monthTextColor: Colors.text,
-              indicatorColor: Colors.tintColor,
+              indicatorColor: Colors.primary["500"],
               textDayFontFamily: "overpass-black",
               textMonthFontFamily: "overpass-black",
               textDayHeaderFontFamily: "overpass-black"
             }}
           />
-          <View
-            style={{
-              marginTop: "auto",
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              alignItems: "center"
-            }}
-          >
+          <InputActionsContainer>
             <Button
               type="clear"
               title="Cancel"
@@ -548,15 +541,15 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
               }}
               titleStyle={{
                 fontFamily: "overpass-black",
-                color: Colors.foreground
+                color: Colors.grey["0"]
               }}
               buttonStyle={{
                 marginLeft: 16,
                 width: 100,
-                backgroundColor: Colors.tintColor
+                backgroundColor: Colors.primary["500"]
               }}
             />
-          </View>
+          </InputActionsContainer>
         </View>
       </SafeAreaView>
     </Modal>
@@ -567,15 +560,14 @@ export default function EventDetailScreen({ navigation }) {
   const title = navigation.getParam("title");
   const eventId = navigation.getParam("eventId");
 
-  const [showTitleModal, setShowTitleModal] = useState(false);
-  const [showVenueModal, setShowVenueModal] = useState(false);
+  const [event] = useEventConnection(eventId);
+  const [showActionBarModal, setShowActionBarModal] = useState(false);
   const [showHotelModal, setShowHotelModal] = useState(false);
   const [showTasksModal, setShowTasksModal] = useState(false);
-  const [showActionBarModal, setShowActionBarModal] = useState(false);
-  const [updating, setUpdating] = useState(true);
+  const [showTitleModal, setShowTitleModal] = useState(false);
+  const [showVenueModal, setShowVenueModal] = useState(false);
   const [touchedData, setTouchedData] = useState(null);
-
-  const [event] = useEventConnection(eventId);
+  const [updating, setUpdating] = useState(true);
 
   useEffect(() => {
     if (event) {
@@ -626,10 +618,32 @@ export default function EventDetailScreen({ navigation }) {
     }
   }, [event, touchedData, setTouchedData, setUpdating]);
 
+  const onCancel = () => {
+    Alert.alert("Delete Event", "Are you sure?", [
+      {
+        text: "Cancel",
+        style: "cancel"
+      },
+      {
+        text: "OK",
+        onPress: async () => {
+          setUpdating(true);
+          await API.graphql(
+            graphqlOperation(deleteEvent, {
+              input: { id: event.id }
+            })
+          );
+          setUpdating(false);
+          navigation.goBack();
+        }
+      }
+    ]);
+  };
+
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>
-        <Actions style={{ paddingHorizontal: 16 }}>
+        <Actions>
           <Button
             onPress={() => navigation.goBack()}
             containerStyle={{ marginTop: 6, marginRight: "auto" }}
@@ -640,50 +654,21 @@ export default function EventDetailScreen({ navigation }) {
             type="clear"
             title="Go Back"
           />
-          {updating && <ActivityIndicator color={Colors.tintColor} />}
-          <TouchableOpacity
-            style={{ marginLeft: 16 }}
-            onPress={() => {
-              Alert.alert("Delete Event", "Are you sure?", [
-                {
-                  text: "Cancel",
-                  style: "cancel"
-                },
-                {
-                  text: "OK",
-                  onPress: async () => {
-                    setUpdating(true);
-                    await API.graphql(
-                      graphqlOperation(deleteEvent, {
-                        input: { id: event.id }
-                      })
-                    );
-                    setUpdating(false);
-                    navigation.goBack();
-                  }
-                }
-              ]);
-            }}
-          >
+          {updating && <ActivityIndicator color={Colors.primary["500"]} />}
+          <CancelButton onPress={onCancel}>
             <Icon
               size={24}
               type="feather"
               name="delete"
-              color={Colors.tintColor}
+              color={Colors.primary["500"]}
             />
-          </TouchableOpacity>
+          </CancelButton>
         </Actions>
-        <View
-          style={{
-            justifyContent: "flex-start",
-            alignItems: "flex-start",
-            paddingHorizontal: 24
-          }}
-        >
+        <TitleContainer>
           <TouchableOpacity onPress={() => setShowTitleModal(true)}>
             <Title>{event ? event.title : title}</Title>
           </TouchableOpacity>
-        </View>
+        </TitleContainer>
         {event && (
           <EventDatesContainer>
             <DatesPicker
@@ -697,15 +682,9 @@ export default function EventDetailScreen({ navigation }) {
           </EventDatesContainer>
         )}
         {event && (
-          <View
-            style={{
-              borderBottomWidth: 1,
-              borderBottomColor: Colors.borders,
-              paddingHorizontal: -16
-            }}
-          >
+          <WeatherContainer>
             <Weather forecast={event.weather} />
-          </View>
+          </WeatherContainer>
         )}
         <ScrollView
           style={{ flex: 1 }}
@@ -713,7 +692,7 @@ export default function EventDetailScreen({ navigation }) {
         >
           {event && (
             <View>
-              <View style={{ paddingHorizontal: 8 }}>
+              <ContactsContainer>
                 <Contacts
                   showControls={true}
                   contacts={event.contacts}
@@ -723,7 +702,7 @@ export default function EventDetailScreen({ navigation }) {
                     });
                   }}
                 />
-              </View>
+              </ContactsContainer>
               <View
                 style={event.hotel ? { marginBottom: 8, flex: 1 } : { flex: 1 }}
               >
@@ -740,35 +719,28 @@ export default function EventDetailScreen({ navigation }) {
                   location={event.hotel}
                 />
               </View>
-              <View
-                style={{
-                  borderBottomWidth: 1,
-                  borderBottomColor: Colors.borders,
-                  paddingHorizontal: 8
-                }}
-              >
-                <ActionBar
-                  showEditButton
-                  onPress={() => setShowActionBarModal(true)}
-                  event={event}
-                />
-              </View>
+              <ActionBarContainer>
+                <EditActionsButton onPress={() => setShowActionBarModal(true)}>
+                  <Icon
+                    size={16}
+                    type="feather"
+                    name="edit"
+                    color={Colors.primary["700"]}
+                  />
+                </EditActionsButton>
+                <ActionBar style={{ flex: 1 }} event={event} />
+              </ActionBarContainer>
               <View>
                 {!!event.tasks.items.length && (
                   <Tasks showDeleteButton tasks={event.tasks.items} />
                 )}
                 <AddTaskButton onPress={() => setShowTasksModal(true)}>
-                  <Text
-                    style={{
-                      marginBottom: -5,
-                      fontSize: 18,
-                      color: Colors.tintColor,
-                      fontFamily: "overpass-black"
-                    }}
-                  >
-                    Add Task
-                  </Text>
-                  <Feather name="plus" color={Colors.tintColor} size={20} />
+                  <AddTaskButtonText>Add Task</AddTaskButtonText>
+                  <Feather
+                    name="plus"
+                    color={Colors.primary["500"]}
+                    size={20}
+                  />
                 </AddTaskButton>
               </View>
             </View>
@@ -834,3 +806,18 @@ export default function EventDetailScreen({ navigation }) {
 EventDetailScreen.navigationOptions = {
   header: null
 };
+
+const styles = StyleSheet.create({
+  inputErrorStyle: { color: Colors.primary["500"] },
+  inputContainerContainerStyle: {
+    borderBottomColor: Colors.primary["500"]
+  },
+  inputContainerStyle: {
+    marginTop: "auto"
+  },
+  inputStyle: {
+    fontSize: 24,
+    color: Colors.primary["500"],
+    fontFamily: "overpass-black"
+  }
+});

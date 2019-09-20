@@ -31,42 +31,42 @@ const theme = {
   ...StyleSheet.create({
     container: {
       ...AmplifyTheme.container,
-      backgroundColor: Colors.foreground,
+      backgroundColor: Colors.grey["0"],
       marginTop: 16,
       paddingTop: 0
     },
     section: { ...AmplifyTheme.section, paddingTop: 0 },
     button: {
       ...AmplifyTheme.button,
-      backgroundColor: Colors.tintColor,
+      backgroundColor: Colors.primary["500"],
       borderRadius: 4
     },
     buttonDisabled: {
       ...AmplifyTheme.buttonDisabled,
-      backgroundColor: Colors.tintColor
+      backgroundColor: Colors.primary["200"]
     },
     sectionFooterLink: {
       ...AmplifyTheme.sectionFooterLink,
-      color: Colors.tintColor
+      color: Colors.primary["300"]
     },
     input: {
       ...AmplifyTheme.input,
-      color: Colors.tintColor,
-      borderColor: Colors.tintColor,
+      color: Colors.primary["500"],
+      borderColor: Colors.primary["500"],
       fontFamily: "overpass-bold"
     },
     inputLabel: {
       ...AmplifyTheme.inputLabel,
-      color: Colors.tintColor,
+      color: Colors.primary["500"],
       fontFamily: "overpass-bold"
     },
     sectionHeaderText: {
       ...AmplifyTheme.sectionHeaderText,
-      color: Colors.tintColor,
+      color: Colors.primary["500"],
       fontFamily: "permanent-marker"
     },
     greetingMessage: {
-      color: Colors.tintColor
+      color: Colors.primary["500"]
     }
   })
 };
@@ -127,10 +127,7 @@ export default function App(props) {
 
 async function loadResourcesAsync() {
   await Promise.all([
-    // Asset.loadAsync([
-    //   require("./assets/images/robot-dev.png"),
-    //   require("./assets/images/robot-prod.png")
-    // ]),
+    // Asset.loadAsync([require("./assets/images/map-marker.png")]),
     Font.loadAsync({
       // This is the font that we are using for our tab bar
       ...Ionicons.font,

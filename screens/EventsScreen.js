@@ -32,20 +32,20 @@ const AddEventButton = styled.TouchableOpacity`
   width: 64px;
   height: 64px;
   border-radius: 32px;
-  background-color: ${Colors.foreground};
+  background-color: ${Colors.grey["0"]};
   justify-content: center;
   align-items: center;
   box-shadow: 2px 2px 2px rgba(0, 0, 0, 0.2);
 `;
 
 const EventTitle = styled.Text`
-  color: ${Colors.foreground};
+  color: ${Colors.grey["0"]};
   font-size: 20px;
   font-family: "permanent-marker";
 `;
 
 const EventDates = styled.Text`
-  color: ${Colors.foreground};
+  color: ${Colors.grey["0"]};
   font-family: "overpass-bold";
   font-size: 14px;
 `;
@@ -69,7 +69,7 @@ const EmptyDate = memo(() => {
           marginTop: 24,
           flex: 1,
           height: 1,
-          backgroundColor: "#e4eaed"
+          backgroundColor: Colors.primary["200"]
         }}
       />
     </View>
@@ -87,7 +87,7 @@ const Item = memo(({ item, onPress, isFirstItem }) => (
     <TouchableOpacity onPress={onPress}>
       <View
         style={{
-          backgroundColor: Colors.tintColor,
+          backgroundColor: Colors.primary["500"],
           paddingHorizontal: 16,
           paddingVertical: 8,
           borderRadius: 4
@@ -105,6 +105,7 @@ const Item = memo(({ item, onPress, isFirstItem }) => (
 export default function EventsScreen({ navigation }) {
   const [user, setUser] = useState(null);
   const [calendarDays, setCalendarDays] = useState({});
+  const [markedDays, setMarkedDays] = useState({});
   const [activeMonth, setActiveMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -228,10 +229,20 @@ export default function EventsScreen({ navigation }) {
           return mem;
         }, {});
 
+        const marked = Object.keys(items).reduce((mem, key) => {
+          mem[key] = { marked: !!items[key].length };
+          return mem;
+        }, {});
+
         // update calendar days with month
         setCalendarDays({
           ...calendarDays,
           ...items
+        });
+
+        setMarkedDays({
+          ...markedDays,
+          ...marked
         });
       } catch (error) {
         console.log(error.message);
@@ -432,7 +443,7 @@ export default function EventsScreen({ navigation }) {
   return (
     <SafeAreaView
       style={{
-        backgroundColor: Colors.foreground,
+        backgroundColor: Colors.grey["0"],
         flex: 1
       }}
     >
@@ -455,7 +466,9 @@ export default function EventsScreen({ navigation }) {
         )}
         {selectedDate && (
           <Agenda
+            displayLoadingIndicator
             selected={selectedDate}
+            markedDates={markedDays}
             loadItemsForMonth={day => {
               const start = startOfMonth(
                 parse(day.dateString, "yyyy-MM-dd", new Date())
@@ -480,26 +493,30 @@ export default function EventsScreen({ navigation }) {
               />
             )}
             theme={{
-              backgroundColor: Colors.background,
-              selectedDayBackgroundColor: Colors.tintColor,
-              selectedDayTextColor: Colors.foreground,
-              todayTextColor: Colors.tintColor,
+              backgroundColor: Colors.primary["100"],
+              selectedDayBackgroundColor: Colors.primary["500"],
+              selectedDayTextColor: Colors.grey["0"],
+              todayTextColor: Colors.primary["500"],
               dayTextColor: Colors.text,
-              textDisabledColor: Colors.inactive,
-              dotColor: Colors.tintColor,
-              selectedDotColor: Colors.foreground,
+              textDisabledColor: Colors.primary["200"],
+              dotColor: Colors.primary["500"],
+              selectedDotColor: Colors.grey["0"],
               monthTextColor: Colors.text,
-              indicatorColor: Colors.tintColor,
-              agendaDayTextColor: Colors.tintColor,
-              agendaDayNumColor: Colors.tintColor,
-              agendaTodayColor: Colors.tintColor,
-              agendaKnobColor: Colors.inactive
+              indicatorColor: Colors.primary["500"],
+              agendaDayTextColor: Colors.primary["500"],
+              agendaDayNumColor: Colors.primary["500"],
+              agendaTodayColor: Colors.primary["500"],
+              agendaKnobColor: Colors.primary["200"]
             }}
           />
         )}
       </View>
       <AddEventButton onPress={() => navigation.navigate("CreateEvent")}>
-        <FontAwesome5 name="calendar-plus" color={Colors.tintColor} size={24} />
+        <FontAwesome5
+          name="calendar-plus"
+          color={Colors.primary["500"]}
+          size={24}
+        />
       </AddEventButton>
     </SafeAreaView>
   );

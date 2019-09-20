@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import { Text, View } from "react-native";
 import styled from "@emotion/native";
 import parse from "date-fns/parse";
 import format from "date-fns/format";
@@ -14,11 +13,11 @@ import Tasks from "./Tasks";
 import useEventConnection from "../hooks/event-connection";
 
 const EventCard = styled.View`
-  background-color: ${Colors.foreground};
+  background-color: ${Colors.grey["0"]};
   margin: 0 24px 24px;
   flex: 1;
   border-radius: 4px;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.2);
+  box-shadow: 1px 1px 1px ${Colors.shadow};
 `;
 
 const EventTitle = styled.Text`
@@ -28,7 +27,7 @@ const EventTitle = styled.Text`
 `;
 
 const EventDates = styled.Text`
-  color: ${Colors.text};
+  color: ${Colors.grey["700"]};
   font-family: "overpass-bold";
 `;
 
@@ -39,6 +38,27 @@ const Summary = styled.TouchableOpacity`
 const EventDatesContainer = styled.View`
   flex-direction: row;
   margin-bottom: 16;
+`;
+
+const TimeToEvent = styled.Text`
+  color: ${Colors.primary["500"]};
+  font-family: "overpass-bold";
+`;
+
+const WeatherContainer = styled.View`
+  margin-horizontal: -16px;
+`;
+
+const ContactsContainer = styled.View`
+  min-height: 50px;
+  border-top-width: 1px;
+  border-top-color: ${Colors.borders};
+  padding-horizontal: 16px;
+`;
+
+const ActionBarContainer = styled.View`
+  border-top-width: ${props => (props.hideBorder ? 0 : 1)};
+  border-top-color: ${Colors.borders};
 `;
 
 const getDisplayDates = (startDate, endDate) => {
@@ -72,43 +92,26 @@ export default props => {
 
   return (
     <EventCard>
-      <Summary onPress={props.onPress}>
+      <Summary activeOpacity={0.6} onPress={props.onPress}>
         <EventTitle>{event.title}</EventTitle>
         <EventDatesContainer>
-          <EventDates>
-            {displayDates} -{" "}
-            <Text style={{ color: Colors.tintColor }}>
-              in {displayTimeToEvent}
-            </Text>
-          </EventDates>
+          <EventDates>{displayDates} -</EventDates>
+          <TimeToEvent> in {displayTimeToEvent}</TimeToEvent>
         </EventDatesContainer>
-        <View style={{ marginHorizontal: -16 }}>
+        <WeatherContainer>
           <Weather forecast={event.weather} />
-        </View>
+        </WeatherContainer>
       </Summary>
       {!!event.contacts.length && (
-        <View
-          style={{
-            minHeight: 50,
-            borderTopColor: Colors.borders,
-            borderTopWidth: 1
-          }}
-        >
-          <View style={{ paddingHorizontal: 16 }}>
-            <Contacts contacts={event.contacts} />
-          </View>
-        </View>
+        <ContactsContainer>
+          <Contacts contacts={event.contacts} />
+        </ContactsContainer>
       )}
       <Map venue={event.venue} hotel={event.hotel} />
       <Tasks tasks={event.tasks.items} />
-      <View
-        style={{
-          borderTopWidth: event.tasks.items.length ? 0 : 1,
-          borderTopColor: Colors.borders
-        }}
-      >
+      <ActionBarContainer hideBorder={!!event.tasks.items.length}>
         <ActionBar event={event} />
-      </View>
+      </ActionBarContainer>
     </EventCard>
   );
 };

@@ -1,6 +1,7 @@
 import React from "react";
 import { View, Text } from "react-native";
 import { Feather } from "@expo/vector-icons";
+import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
 
@@ -12,49 +13,43 @@ const ICON_MAP = {
   WINDY: "wind"
 };
 
-export default props => (
-  <View
-    style={{
-      paddingTop: 8,
-      paddingBottom: 6
-    }}
-  >
-    {!props.forecast.length > 0 && (
-      <Text
-        style={{
-          marginBottom: 4,
-          textAlign: "center",
-          fontFamily: "overpass-black",
-          color: Colors.text
-        }}
-      >
-        Weather not available for this location
-      </Text>
-    )}
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "stretch"
-      }}
-    >
-      {props.forecast.map((day, index) => (
-        <View
-          key={`${day.icon}-${day.temp}-${index}`}
-          style={{ justifyContent: "center", flex: 1, alignItems: "center" }}
-        >
-          <Feather
-            size={20}
-            name={ICON_MAP[day.icon]}
-            color={Colors.tintColor}
-          />
-          <Text
-            style={{ fontFamily: "overpass-black", color: Colors.tintColor }}
-          >
-            {day.temp}
-          </Text>
-        </View>
-      ))}
-    </View>
-  </View>
-);
+const Weather = styled.View`
+  padding-bottom: 6px;
+  padding-top: 8px;
+`;
+
+const Forecast = styled.View`
+  align-items: center;
+  flex-direction: row;
+  justify-content: center;
+`;
+
+const Day = styled.View`
+  align-items: center;
+  flex: 1;
+  justify-content: center;
+`;
+
+const Temp = styled.Text`
+  font-family: "overpass-black";
+  color: ${Colors.primary["700"]};
+`;
+
+export default props => {
+  return (
+    <Weather>
+      <Forecast>
+        {props.forecast.map((day, index) => (
+          <Day key={`${day.icon}-${day.temp}-${index}`}>
+            <Feather
+              size={20}
+              name={ICON_MAP[day.icon]}
+              color={Colors.primary["700"]}
+            />
+            <Temp>{day.temp}</Temp>
+          </Day>
+        ))}
+      </Forecast>
+    </Weather>
+  );
+};

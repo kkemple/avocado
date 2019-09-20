@@ -70,8 +70,8 @@ export default function HomeScreen({ navigation }) {
         styles.container,
         {
           backgroundColor: sortedEvents.length
-            ? Colors.background
-            : Colors.foreground
+            ? Colors.primary["100"]
+            : Colors.grey["0"]
         }
       ]}
     >
@@ -118,12 +118,6 @@ export default function HomeScreen({ navigation }) {
 }
 
 HomeScreen.navigationOptions = {
-  // title: "Avocado",
-  // headerTintColor: Colors.tintColor,
-  // headerTitleStyle: {
-  //   fontFamily: "permanent-marker",
-  //   fontSize: 24
-  // }
   header: null
 };
 

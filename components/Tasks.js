@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Alert, ActivityIndicator, TouchableOpacity, View } from "react-native";
+import { Alert, ActivityIndicator, View } from "react-native";
 import styled from "@emotion/native";
 import { Feather } from "@expo/vector-icons";
 import parse from "date-fns/parse";
@@ -25,13 +25,71 @@ const TaskTitle = styled.Text`
 `;
 
 const TaskDueDate = styled.Text`
-  color: ${Colors.tintColor};
+  color: ${Colors.primary["600"]};
+`;
+
+const Actions = styled.View`
+  flex-direction: row;
+  align-items: center;
+`;
+
+const Action = styled.TouchableOpacity`
+  justify-content: center;
+  align-items: center;
 `;
 
 export default ({ tasks, showDeleteButton }) => {
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [activeIndex, setActiveIndex] = useState(null);
+
+  const onDelete = (id, index) => async () => {
+    if (isDeleting) return;
+
+    Alert.alert("Delete Event", "Are you sure?", [
+      {
+        text: "Cancel",
+        style: "cancel"
+      },
+      {
+        text: "OK",
+        onPress: async () => {
+          setActiveIndex(index);
+          setIsDeleting(true);
+
+          await API.graphql(
+            graphqlOperation(deleteTask, {
+              input: {
+                id
+              }
+            })
+          );
+
+          setIsDeleting(false);
+          setActiveIndex(null);
+        }
+      }
+    ]);
+  };
+
+  const onToggleCompleted = (id, current, index) => async () => {
+    if (isUpdating) return;
+
+    setActiveIndex(index);
+    setIsUpdating(true);
+
+    await API.graphql(
+      graphqlOperation(updateTask, {
+        input: {
+          id,
+          completed: !current
+        }
+      })
+    );
+
+    setIsUpdating(false);
+    setActiveIndex(null);
+  };
 
   return (
     <Tasks>
@@ -47,85 +105,39 @@ export default ({ tasks, showDeleteButton }) => {
               <TaskTitle>{task.title}</TaskTitle>
               <TaskDueDate>Due in {timeTillDue}</TaskDueDate>
             </View>
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <TouchableOpacity
-                onPress={async () => {
-                  if (isUpdating) return;
-
-                  setActiveIndex(index);
-                  setIsUpdating(true);
-
-                  await API.graphql(
-                    graphqlOperation(updateTask, {
-                      input: {
-                        id: task.id,
-                        completed: !task.completed
-                      }
-                    })
-                  );
-
-                  setIsUpdating(false);
-                  setActiveIndex(null);
-                }}
-                style={{
-                  justifyContent: "center",
-                  alignItems: "center"
-                }}
+            <Actions>
+              <Action
+                activeOpacity={0.6}
+                onPress={onToggleCompleted(task.id, task.completed, index)}
               >
                 {isUpdating && activeIndex === index ? (
-                  <ActivityIndicator color={Colors.tintColor} />
+                  <ActivityIndicator color={Colors.primary["500"]} />
                 ) : (
                   <Feather
                     name={task.completed ? "check" : "square"}
-                    color={Colors.tintColor}
+                    color={Colors.primary["500"]}
                     size={20}
                   />
                 )}
-              </TouchableOpacity>
+              </Action>
               {showDeleteButton && (
-                <TouchableOpacity
-                  onPress={async () => {
-                    if (isDeleting) return;
-
-                    Alert.alert("Delete Event", "Are you sure?", [
-                      {
-                        text: "Cancel",
-                        style: "cancel"
-                      },
-                      {
-                        text: "OK",
-                        onPress: async () => {
-                          setActiveIndex(index);
-                          setIsDeleting(true);
-
-                          await API.graphql(
-                            graphqlOperation(deleteTask, {
-                              input: {
-                                id: task.id
-                              }
-                            })
-                          );
-
-                          setIsDeleting(false);
-                          setActiveIndex(null);
-                        }
-                      }
-                    ]);
-                  }}
-                  style={{
-                    justifyContent: "center",
-                    alignItems: "center",
-                    marginLeft: 8
-                  }}
+                <Action
+                  activeOpacity={0.6}
+                  onPress={onDelete(task.id, index)}
+                  style={{ marginLeft: 8 }}
                 >
                   {isDeleting && activeIndex === index ? (
-                    <ActivityIndicator color={Colors.tintColor} />
+                    <ActivityIndicator color={Colors.primary["500"]} />
                   ) : (
-                    <Feather name="delete" color={Colors.tintColor} size={20} />
+                    <Feather
+                      name="delete"
+                      color={Colors.primary["500"]}
+                      size={20}
+                    />
                   )}
-                </TouchableOpacity>
+                </Action>
               )}
-            </View>
+            </Actions>
           </Task>
         );
       })}

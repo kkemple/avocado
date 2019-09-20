@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Alert } from "react-native";
+import { View, Alert, StyleSheet } from "react-native";
 import styled from "@emotion/native";
 import { Button, Input } from "react-native-elements";
 import { TabView } from "react-native-tab-view";
@@ -111,7 +111,18 @@ const WizardViewQuestion = styled.Text`
   font-family: "overpass-regular";
   font-size: 36px;
   margin-bottom: 16px;
-  color: ${Colors.tintColor};
+  color: ${Colors.primary["500"]};
+`;
+
+const Header = styled.View`
+  align-items: flex-start;
+  justify-content: flex-start;
+`;
+
+const Actions = styled.View`
+  align-items: center;
+  flex-direction: row;
+  justify-content: flex-end;
 `;
 
 const ContactsInput = ({ onContactsSelected, value }) => (
@@ -133,13 +144,13 @@ const TitleInput = ({ onChange, value }) => (
       value={value}
       onChangeText={onChange}
       errorMessage="Required"
-      errorStyle={{ color: Colors.tintColor }}
+      errorStyle={{ color: Colors.primary["500"] }}
       inputContainerStyle={{
-        borderBottomColor: Colors.tintColor
+        borderBottomColor: Colors.primary["500"]
       }}
       inputStyle={{
         fontSize: 24,
-        color: Colors.tintColor,
+        color: Colors.primary["500"],
         fontFamily: "overpass-bold"
       }}
     />
@@ -188,11 +199,11 @@ const WebsiteInput = ({ onChange, value }) => (
       value={value}
       containerStyle={{ marginBottom: 26 }}
       inputContainerStyle={{
-        borderBottomColor: Colors.tintColor
+        borderBottomColor: Colors.primary["500"]
       }}
       inputStyle={{
         fontSize: 24,
-        color: Colors.tintColor,
+        color: Colors.primary["500"],
         fontFamily: "overpass-bold"
       }}
     />
@@ -209,11 +220,11 @@ const TwitterInput = ({ onChange, value }) => (
       value={value}
       containerStyle={{ marginBottom: 26 }}
       inputContainerStyle={{
-        borderBottomColor: Colors.tintColor
+        borderBottomColor: Colors.primary["500"]
       }}
       inputStyle={{
         fontSize: 24,
-        color: Colors.tintColor,
+        color: Colors.primary["500"],
         fontFamily: "overpass-bold"
       }}
     />
@@ -228,11 +239,11 @@ const TicketsInput = ({ onChange, value }) => (
       value={value}
       containerStyle={{ marginBottom: 26 }}
       inputContainerStyle={{
-        borderBottomColor: Colors.tintColor
+        borderBottomColor: Colors.primary["500"]
       }}
       inputStyle={{
         fontSize: 24,
-        color: Colors.tintColor,
+        color: Colors.primary["500"],
         fontFamily: "overpass-bold"
       }}
     />
@@ -240,6 +251,7 @@ const TicketsInput = ({ onChange, value }) => (
 );
 
 export default function CreateEventScreen({ navigation }) {
+  const [submitting, setSubmitting] = useState(false);
   const defaults = {
     title: null,
     twitter: null,
@@ -251,7 +263,6 @@ export default function CreateEventScreen({ navigation }) {
     tasks: [],
     contacts: []
   };
-
   const [navigationState, setNavigationState] = useState({
     index: 0,
     routes: [
@@ -266,31 +277,87 @@ export default function CreateEventScreen({ navigation }) {
       { key: "tickets" }
     ]
   });
-
   const [eventData, setEventData] = useState(defaults);
-  const [submitting, setSubmitting] = useState(false);
+
+  const onDoneButtonPressed = async () => {
+    if (navigationState.index + 1 === navigationState.routes.length) {
+      if (!submitting) {
+        try {
+          setSubmitting(true);
+
+          const { tasks, ...input } = eventData;
+          const endDate = parse(input.dates.end, "yyyy-MM-dd", new Date());
+          const timestamp = getTime(endDate);
+
+          const {
+            data: { createEvent: event }
+          } = await API.graphql(
+            graphqlOperation(createEvent, {
+              input: {
+                ...input,
+                timestamp: `${timestamp}`
+              }
+            })
+          );
+
+          if (tasks.length) {
+            await Promise.all(
+              tasks.map(task => {
+                return API.graphql(
+                  graphqlOperation(createTask, {
+                    input: {
+                      ...task,
+                      completed: false,
+                      taskEventId: event.id
+                    }
+                  })
+                );
+              })
+            );
+          }
+
+          setEventData(defaults);
+          setSubmitting(false);
+
+          navigation.goBack();
+        } catch (error) {
+          console.log(error);
+          Alert.alert(
+            `There was an error creating your event! - ${error.message}`
+          );
+          setSubmitting(false);
+        }
+      }
+      return;
+    }
+
+    const key = navigationState.routes[navigationState.index].key;
+    const value = eventData[key];
+    const isValid = await stepIsValid(key, value);
+
+    if (isValid) {
+      setNavigationState(state => ({
+        ...state,
+        index: state.index + 1
+      }));
+    } else {
+      Alert.alert(errors[key]);
+    }
+  };
 
   return (
     <SafeAreaView style={{ flex: 1 }}>
       <View style={{ flex: 1, padding: 24 }}>
-        <View
-          style={{
-            justifyContent: "flex-start",
-            alignItems: "flex-start"
-          }}
-        >
+        <Header>
           <Button
             onPress={() => navigation.goBack()}
-            containerStyle={{ marginTop: 6, marginLeft: -10 }}
-            titleStyle={{
-              fontFamily: "overpass-bold",
-              color: Colors.inactive
-            }}
+            containerStyle={styles.cancelButtonStyles}
+            titleStyle={styles.cancelButtonTitleStyles}
             type="clear"
             title="Cancel"
           />
           <Title>Create Event</Title>
-        </View>
+        </Header>
         <View style={{ flex: 1 }}>
           <TabView
             swipeEnabled={false}
@@ -390,13 +457,7 @@ export default function CreateEventScreen({ navigation }) {
             }}
           />
 
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "flex-end",
-              alignItems: "center"
-            }}
-          >
+          <Actions>
             {navigationState.index !== 0 && (
               <Button
                 onPress={() => {
@@ -405,10 +466,7 @@ export default function CreateEventScreen({ navigation }) {
                     index: state.index - 1
                   }));
                 }}
-                titleStyle={{
-                  fontFamily: "overpass-bold",
-                  color: Colors.inactive
-                }}
+                titleStyle={styles.backButtonTitleStyles}
                 type="clear"
                 title="Back"
               />
@@ -420,101 +478,32 @@ export default function CreateEventScreen({ navigation }) {
                   ? "solid"
                   : "outline"
               }
-              onPress={async () => {
-                if (
-                  navigationState.index + 1 ===
-                  navigationState.routes.length
-                ) {
-                  if (!submitting) {
-                    try {
-                      setSubmitting(true);
-
-                      const { tasks, ...input } = eventData;
-                      const endDate = parse(
-                        input.dates.end,
-                        "yyyy-MM-dd",
-                        new Date()
-                      );
-                      const timestamp = getTime(endDate);
-
-                      const {
-                        data: { createEvent: event }
-                      } = await API.graphql(
-                        graphqlOperation(createEvent, {
-                          input: {
-                            ...input,
-                            timestamp: `${timestamp}`
-                          }
-                        })
-                      );
-
-                      if (tasks.length) {
-                        await Promise.all(
-                          tasks.map(task => {
-                            return API.graphql(
-                              graphqlOperation(createTask, {
-                                input: {
-                                  ...task,
-                                  completed: false,
-                                  taskEventId: event.id
-                                }
-                              })
-                            );
-                          })
-                        );
-                      }
-
-                      setEventData(defaults);
-                      setSubmitting(false);
-
-                      navigation.goBack();
-                    } catch (error) {
-                      console.log(error);
-                      Alert.alert(
-                        `There was an error creating your event! - ${error.message}`
-                      );
-                      setSubmitting(false);
-                    }
-                  }
-                  return;
+              onPress={onDoneButtonPressed}
+              titleStyle={[
+                styles.doneButtonTitleStyles,
+                {
+                  color:
+                    navigationState.index + 1 === navigationState.routes.length
+                      ? Colors.grey["0"]
+                      : Colors.primary["500"]
                 }
-
-                const key = navigationState.routes[navigationState.index].key;
-                const value = eventData[key];
-                const isValid = await stepIsValid(key, value);
-
-                if (isValid) {
-                  setNavigationState(state => ({
-                    ...state,
-                    index: state.index + 1
-                  }));
-                } else {
-                  Alert.alert(errors[key]);
-                }
-              }}
-              titleStyle={{
-                fontFamily: "overpass-black",
-                color:
-                  navigationState.index + 1 === navigationState.routes.length
-                    ? Colors.foreground
-                    : Colors.tintColor
-              }}
+              ]}
               title={
                 navigationState.index + 1 === navigationState.routes.length
                   ? "Done"
                   : "Next"
               }
-              buttonStyle={{
-                marginLeft: 16,
-                width: 100,
-                borderColor: Colors.tintColor,
-                backgroundColor:
-                  navigationState.index + 1 === navigationState.routes.length
-                    ? Colors.tintColor
-                    : "transparent"
-              }}
+              buttonStyle={[
+                styles.doneButtonStyles,
+                {
+                  backgroundColor:
+                    navigationState.index + 1 === navigationState.routes.length
+                      ? Colors.primary["500"]
+                      : "transparent"
+                }
+              ]}
             />
-          </View>
+          </Actions>
         </View>
       </View>
     </SafeAreaView>
@@ -524,3 +513,26 @@ export default function CreateEventScreen({ navigation }) {
 CreateEventScreen.navigationOptions = {
   header: null
 };
+
+const styles = StyleSheet.create({
+  backButtonTitleStyles: {
+    fontFamily: "overpass-bold",
+    color: Colors.inactive
+  },
+  cancelButtonTitleStyles: {
+    fontFamily: "overpass-bold",
+    color: Colors.inactive
+  },
+  cancelButtonStyles: {
+    marginTop: 6,
+    marginLeft: -10
+  },
+  doneButtonStyles: {
+    marginLeft: 16,
+    width: 100,
+    borderColor: Colors.primary["500"]
+  },
+  doneButtonTitleStyles: {
+    fontFamily: "overpass-black"
+  }
+});

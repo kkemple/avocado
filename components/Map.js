@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Share, TouchableOpacity, Text, View, Image } from "react-native";
+import { Share, View, Image } from "react-native";
 import styled from "@emotion/native";
 import { FontAwesome5 } from "@expo/vector-icons";
 import MapView, { Marker } from "react-native-maps";
@@ -8,7 +8,7 @@ import { Icon } from "react-native-elements";
 import Colors from "../constants/Colors";
 
 const StyledMapView = styled(MapView)`
-  background-color: ${Colors.tintColor};
+  background-color: ${Colors.primary["500"]};
   width: 100%;
 `;
 
@@ -17,26 +17,58 @@ const MapViewContainer = styled.View`
 `;
 
 const CurrentMapLocation = styled.View`
+  align-items: center;
+  background-color: ${Colors.grey["0"]};
+  border-radius: 4px;
+  box-shadow: 1px 1px 1px ${Colors.shadow};
   flex-direction: row;
   justify-content: center;
-  align-items: center;
-  box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.3);
-  background-color: ${Colors.foreground};
-  border-radius: 4px;
+  margin: 8px;
   padding-bottom: 4px;
   padding-top: 6px;
   width: 100px;
-  margin: 8px 8px 8px 0;
 `;
 
 const CurrentMapLocationOption = styled.View`
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+`;
+
+const MapControls = styled.View`
+  align-items: flex-end;
+  bottom: 0;
+  flex: 1;
+  justify-content: flex-end;
+  position: absolute;
+  right: 0;
+  top: 0;
+`;
+
+const Control = styled.TouchableOpacity`
+  align-items: center;
+  background-color: ${Colors.grey["0"]};
+  border-radius: 22px;
+  box-shadow: 1px 1px 1px ${Colors.shadow};
+  height: 44px;
+  justify-content: center;
+  margin: 8px;
+  width: 44px;
+`;
+
+const CurrentLocationButton = styled.TouchableOpacity`
+  flex: 1;
+`;
+
+const CurrentLocationButtonText = styled.Text`
+  color: ${props =>
+    props.active ? Colors.primary["500"] : Colors.primary["200"]};
+  font-family: "overpass-black";
+  font-size: 10px;
 `;
 
 export default ({ mapHeight = 200, showControls = true, venue, hotel }) => {
   const mapView = useRef();
-  const [showBuildings, setShowBuildings] = useState(true);
+  const [showBuildings, setShowBuildings] = useState(false);
   const [currentLocation, setCurrentLocation] = useState(venue);
   const [venueIsActive, setVenueIsActive] = useState(true);
 
@@ -50,7 +82,7 @@ export default ({ mapHeight = 200, showControls = true, venue, hotel }) => {
       camera.altitude = 350;
       camera.zoom = 17;
 
-      mapView.current.animateCamera(camera, { duration: 400 });
+      mapView.current.animateCamera(camera, { duration: 500 });
     };
 
     updateCamera();
@@ -61,9 +93,9 @@ export default ({ mapHeight = 200, showControls = true, venue, hotel }) => {
   }, [
     currentLocation,
     setCurrentLocation,
-    venueIsActive,
     setVenueIsActive,
-    venue
+    venue,
+    venueIsActive
   ]);
 
   return (
@@ -93,100 +125,85 @@ export default ({ mapHeight = 200, showControls = true, venue, hotel }) => {
           }}
           title={currentLocation.name}
           description={currentLocation.address}
-        />
+        >
+          <Image
+            style={{ width: 40, height: 40 }}
+            source={require("../assets/images/map-marker.png")}
+          />
+        </Marker>
       </StyledMapView>
       {showControls && (
-        <View
-          style={{
-            position: "absolute",
-            flex: 1,
-            top: 0,
-            right: 0,
-            bottom: 0,
-            justifyContent: "flex-end",
-            alignItems: "flex-end"
-          }}
-        >
+        <MapControls>
           <View>
-            <TouchableOpacity
-              onPress={() => {
-                Share.share({
-                  message: currentLocation.address
-                });
-              }}
+            <Control
+              activeOpacity={0.6}
+              onPress={() => Share.share({ message: currentLocation.address })}
             >
               <Icon
                 size={20}
                 name="content-copy"
-                raised
-                color={Colors.tintColor}
+                color={Colors.primary["500"]}
               />
-            </TouchableOpacity>
+            </Control>
           </View>
           <View>
-            <TouchableOpacity
-              onPress={() => {
-                setShowBuildings(!showBuildings);
-              }}
+            <Control
+              activeOpacity={0.6}
+              onPress={() => setShowBuildings(!showBuildings)}
             >
               <Icon
-                raised
                 name="building-o"
                 type="font-awesome"
-                color={showBuildings ? Colors.tintColor : Colors.inactive}
+                color={
+                  showBuildings ? Colors.primary["500"] : Colors.primary["200"]
+                }
                 size={20}
               />
-            </TouchableOpacity>
+            </Control>
           </View>
           {venue && hotel && (
             <CurrentMapLocation>
-              <TouchableOpacity
-                style={{ flex: 1 }}
+              <CurrentLocationButton
+                activeOpacity={0.6}
                 onPress={() => setCurrentLocation({ ...venue })}
               >
                 <CurrentMapLocationOption style={{ marginBottom: -4 }}>
                   <Icon
                     name="event"
-                    color={venueIsActive ? Colors.tintColor : Colors.inactive}
+                    color={
+                      venueIsActive
+                        ? Colors.primary["500"]
+                        : Colors.primary["200"]
+                    }
                     size={20}
                   />
-                  <Text
-                    style={{
-                      fontSize: 10,
-                      color: venueIsActive ? Colors.tintColor : Colors.inactive,
-                      fontFamily: "overpass-black"
-                    }}
-                  >
+                  <CurrentLocationButtonText active={venueIsActive}>
                     Event
-                  </Text>
+                  </CurrentLocationButtonText>
                 </CurrentMapLocationOption>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={{ flex: 1 }}
+              </CurrentLocationButton>
+              <CurrentLocationButton
+                activeOpacity={0.6}
                 onPress={() => setCurrentLocation({ ...hotel })}
               >
                 <CurrentMapLocationOption style={{ marginBottom: -4 }}>
                   <FontAwesome5
                     name="bed"
-                    color={!venueIsActive ? Colors.tintColor : Colors.inactive}
+                    color={
+                      !venueIsActive
+                        ? Colors.primary["500"]
+                        : Colors.primary["200"]
+                    }
                     size={18}
                   />
-                  <Text
-                    style={{
-                      fontSize: 10,
-                      color: !venueIsActive
-                        ? Colors.tintColor
-                        : Colors.inactive,
-                      fontFamily: "overpass-black"
-                    }}
-                  >
+                  <CurrentLocationButtonText active={!venueIsActive}>
                     Hotel
-                  </Text>
+                  </CurrentLocationButtonText>
                 </CurrentMapLocationOption>
-              </TouchableOpacity>
+              </CurrentLocationButton>
             </CurrentMapLocation>
           )}
-        </View>
+        </MapControls>
       )}
     </MapViewContainer>
   );

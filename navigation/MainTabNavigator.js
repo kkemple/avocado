@@ -88,12 +88,12 @@ const tabNavigator = createBottomTabNavigator(
     SettingsStack
   },
   {
-    initialRouteName: "HomeStack",
+    initialRouteName: "EventsStack",
     tabBarOptions: {
       activeTintColor: Colors.tabIconSelected,
       inactiveTintColor: Colors.tabIconDefault,
       style: {
-        backgroundColor: Colors.foreground
+        backgroundColor: Colors.tabBar
       },
       labelStyle: {
         fontWeight: "bold"

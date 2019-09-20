@@ -1,14 +1,22 @@
 import React from "react";
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { GooglePlacesAutocomplete } from "react-native-google-places-autocomplete";
+import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
+
+const RequiredText = styled.Text`
+  font-size: 10;
+  margin: 5px;
+  margin-bottom: 10px;
+  color: ${Colors.primary["500"]};
+`;
 
 export default ({ autoFocus = false, required, onLocationSelected, value }) => {
   return (
     <View>
       <GooglePlacesAutocomplete
-        placeholder=""
+        placeholder="Search for a location"
         text={value}
         minLength={2}
         autoFocus={autoFocus}
@@ -44,7 +52,7 @@ export default ({ autoFocus = false, required, onLocationSelected, value }) => {
             position: "relative"
           },
           textInputContainer: {
-            borderBottomColor: Colors.tintColor,
+            borderBottomColor: Colors.primary["500"],
             borderBottomWidth: 1,
             backgroundColor: "transparent",
             paddingTop: 10,
@@ -66,36 +74,25 @@ export default ({ autoFocus = false, required, onLocationSelected, value }) => {
             marginRight: 0,
             paddingLeft: 0,
             paddingRight: 0,
-            color: Colors.tintColor,
+            color: Colors.primary["500"],
             fontFamily: "overpass-bold",
             backgroundColor: "transparent",
             fontSize: 24
           },
           description: {
             fontFamily: "overpass-regular",
-            color: Colors.tintColor,
+            color: Colors.primary["500"],
             marginBottom: -10
           },
           listView: {
             position: "absolute",
             flex: 0,
-            backgroundColor: Colors.foreground,
+            backgroundColor: Colors.grey["0"],
             top: 55
           }
         }}
       />
-      {required && (
-        <Text
-          style={{
-            fontSize: 10,
-            margin: 5,
-            marginBottom: 10,
-            color: Colors.tintColor
-          }}
-        >
-          Required
-        </Text>
-      )}
+      {required && <RequiredText>Required</RequiredText>}
     </View>
   );
 };

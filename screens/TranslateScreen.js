@@ -4,15 +4,12 @@ import {
   View,
   KeyboardAvoidingView,
   Text,
-  Picker,
   Modal,
   ScrollView
 } from "react-native";
 import { Input, Icon, ListItem } from "react-native-elements";
 import { Predictions } from "aws-amplify";
-import styled from "@emotion/native";
 import { SafeAreaView } from "react-navigation";
-import { Audio } from "expo-av";
 
 import Colors from "../constants/Colors";
 
@@ -97,11 +94,6 @@ export default function TranslateScreen() {
 
   const playAudio = async () => {
     try {
-      if (textToTranslate.length < 5) {
-        setTranslatedText("");
-        return;
-      }
-
       const result = await Predictions.convert({
         textToSpeech: {
           source: {
@@ -112,8 +104,17 @@ export default function TranslateScreen() {
         }
       });
 
+      // const response = await fetch(result.speech.url, {
+      //   responseType: "arrayBuffer"
+      // });
+
+      // const blob = await response.blob();
+      // const localUri = `${FileSystem.cacheDirectory}${uuid()}.mp3`;
+
+      // await FileSystem.writeAsStringAsync(localUri, blob);
+
       // const { sound: soundObject, status } = await Audio.Sound.createAsync(
-      //   { uri: result.speech.url },
+      //   { uri: localUri },
       //   { shouldPlay: true }
       // );
 
@@ -170,7 +171,7 @@ export default function TranslateScreen() {
               onChangeText={text => setTextToTranslate(text)}
               inputContainerStyle={{
                 padding: 8,
-                borderColor: Colors.inactive,
+                borderColor: Colors.primary["200"],
                 borderWidth: 2,
                 borderBottomWidth: 2,
                 borderRadius: 4,
@@ -180,7 +181,8 @@ export default function TranslateScreen() {
               inputStyle={{
                 fontSize: 28,
                 height: "100%",
-                color: Colors.text,
+                color: Colors.primary["600"],
+                fontFamily: "overpass-black",
                 alignSelf: "flex-start",
                 paddingTop: 0
               }}
@@ -200,7 +202,7 @@ export default function TranslateScreen() {
                 style={{
                   flex: 4,
                   borderWidth: 1,
-                  borderColor: Colors.tintColor,
+                  borderColor: Colors.primary["500"],
                   borderRadius: 4,
                   padding: 8
                 }}
@@ -209,7 +211,7 @@ export default function TranslateScreen() {
                   style={{
                     textAlign: "center",
                     fontFamily: "overpass-black",
-                    color: Colors.tintColor
+                    color: Colors.primary["500"]
                   }}
                 >
                   {options[selectedFromLanguage].title}
@@ -220,7 +222,7 @@ export default function TranslateScreen() {
                   size={24}
                   name="arrow-right"
                   type="material-community"
-                  color={Colors.tintColor}
+                  color={Colors.primary["500"]}
                 />
               </View>
               <TouchableOpacity
@@ -228,7 +230,7 @@ export default function TranslateScreen() {
                 style={{
                   flex: 4,
                   borderWidth: 1,
-                  borderColor: Colors.tintColor,
+                  borderColor: Colors.primary["500"],
                   borderRadius: 4,
                   padding: 8
                 }}
@@ -237,7 +239,7 @@ export default function TranslateScreen() {
                   style={{
                     textAlign: "center",
                     fontFamily: "overpass-black",
-                    color: Colors.tintColor
+                    color: Colors.primary["500"]
                   }}
                 >
                   {options[selectedToLanguage].title}
@@ -249,7 +251,7 @@ export default function TranslateScreen() {
             <View
               style={{
                 padding: 8,
-                borderColor: Colors.inactive,
+                borderColor: Colors.primary["200"],
                 borderWidth: 2,
                 borderBottomWidth: 2,
                 borderRadius: 4,
@@ -259,7 +261,8 @@ export default function TranslateScreen() {
             >
               <Text
                 style={{
-                  color: Colors.text,
+                  color: Colors.primary["600"],
+                  fontFamily: "overpass-black",
                   alignSelf: "flex-start",
                   fontSize: 28
                 }}
@@ -267,7 +270,7 @@ export default function TranslateScreen() {
                 {translatedText}
               </Text>
             </View>
-            {/* <TouchableOpacity
+            <TouchableOpacity
               onPress={playAudio}
               style={{
                 position: "absolute",
@@ -280,9 +283,9 @@ export default function TranslateScreen() {
                 size={24}
                 name="ear-hearing"
                 type="material-community"
-                color={Colors.tintColor}
+                color={Colors.primary["500"]}
               />
-            </TouchableOpacity> */}
+            </TouchableOpacity>
           </View>
         </KeyboardAvoidingView>
         <Modal visible={showFromLanguagePicker} animationType="slide">
@@ -302,7 +305,7 @@ export default function TranslateScreen() {
                   <ListItem
                     titleStyle={{
                       fontFamily: "overpass-black",
-                      color: Colors.tintColor
+                      color: Colors.primary["500"]
                     }}
                     bottomDivider
                     title={options[option].title}
@@ -329,7 +332,7 @@ export default function TranslateScreen() {
                   <ListItem
                     titleStyle={{
                       fontFamily: "overpass-black",
-                      color: Colors.tintColor
+                      color: Colors.primary["500"]
                     }}
                     bottomDivider
                     title={options[option].title}

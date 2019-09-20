@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import {
-  TouchableOpacity,
-  View,
-  SafeAreaView,
   Modal,
-  ScrollView
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  TouchableOpacity,
+  View
 } from "react-native";
 import { Icon, Avatar, ListItem, Button } from "react-native-elements";
-import * as Contacts from "expo-contacts";
+import styled from "@emotion/native";
+import * as DeviceContacts from "expo-contacts";
 import * as Sharing from "expo-sharing";
 
 import Colors from "../constants/Colors";
@@ -19,12 +21,37 @@ const buildTitle = contact => {
   return `${f}${l}`;
 };
 
+const Contacts = styled.View`
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: center;
+  padding-vertical: 8;
+`;
+
+const ContactButton = styled.TouchableOpacity`
+  margin-right: 8px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const EditContactsButton = styled.TouchableOpacity`
+  align-items: center;
+  align-self: flex-start;
+  background-color: ${Colors.grey["0"]};
+  border-radius: ${props => (props.size === "medium" ? "28px" : "20px")};
+  box-shadow: 1px 1px 1px ${Colors.shadow};
+  height: ${props => (props.size === "medium" ? "52px" : "36px")};
+  justify-content: center;
+  margin: 8px;
+  width: ${props => (props.size === "medium" ? "52px" : "36px")};
+`;
+
 const ContactsList = ({ onContactSelected = () => {}, value = [] }) => {
   const [contacts, setContacts] = useState([]);
   const [selectedContacts, setSelectedContacts] = useState(value);
 
   useEffect(() => {
-    Contacts.getContactsAsync()
+    DeviceContacts.getContactsAsync()
       .then(result => setContacts(result.data))
       .catch(error => console.log(error));
   }, []);
@@ -36,21 +63,23 @@ const ContactsList = ({ onContactSelected = () => {}, value = [] }) => {
   return (
     <View>
       {contacts.map(contact => {
+        const isSelected = !!selectedContacts.find(c => c.id === contact.id);
         const data = {
           id: contact.id,
-          subtitle: contact[Contacts.Fields.Emails]
-            ? contact[Contacts.Fields.Emails][0].email
+          subtitle: contact[DeviceContacts.Fields.Emails]
+            ? contact[DeviceContacts.Fields.Emails][0].email
             : "",
-          image: contact[Contacts.Fields.Image],
-          name: contact[Contacts.Fields.Name],
-          firstName: contact[Contacts.Fields.FirstName],
-          lastName: contact[Contacts.Fields.LastName],
-          emails: contact[Contacts.Fields.Emails]
+          image: contact[DeviceContacts.Fields.Image],
+          name: contact[DeviceContacts.Fields.Name],
+          firstName: contact[DeviceContacts.Fields.FirstName],
+          lastName: contact[DeviceContacts.Fields.LastName],
+          emails: contact[DeviceContacts.Fields.Emails]
         };
-        const isSelected = !!selectedContacts.find(c => c.id === contact.id);
 
         return (
           <TouchableOpacity
+            key={contact.id}
+            activeOpacity={0.6}
             onPress={() => {
               if (isSelected) {
                 setSelectedContacts(
@@ -60,36 +89,27 @@ const ContactsList = ({ onContactSelected = () => {}, value = [] }) => {
                 setSelectedContacts([...selectedContacts, data]);
               }
             }}
-            key={contact.id}
           >
             <ListItem
               bottomDivider
               title={data.name}
               subtitle={data.subtitle}
-              containerStyle={{
-                paddingHorizontal: 16,
-                paddingVertical: 8
-              }}
-              titleStyle={{
-                marginTop: 4,
-                fontFamily: "overpass-bold",
-                fontSize: 14,
-                lineHeight: 15,
-                color: isSelected ? Colors.tintColor : Colors.text
-              }}
-              subtitleStyle={{
-                fontFamily: "overpass-regular",
-                fontSize: 12,
-                lineHeight: 13,
-                color: isSelected ? Colors.tintColor : Colors.text
-              }}
+              containerStyle={styles.listItemContainerStyles}
+              titleStyle={[
+                styles.listItemTitleStyles,
+                { color: isSelected ? Colors.primary["500"] : Colors.text }
+              ]}
+              subtitleStyle={[
+                styles.listItemSubtitleStyles,
+                { color: isSelected ? Colors.primary["500"] : Colors.text }
+              ]}
               leftAvatar={{
                 source: {
                   uri: data.image
                 },
                 placeholderStyle: {
                   backgroundColor: isSelected
-                    ? Colors.tintColor
+                    ? Colors.primary["500"]
                     : Colors.inactive
                 }
               }}
@@ -102,17 +122,13 @@ const ContactsList = ({ onContactSelected = () => {}, value = [] }) => {
 };
 
 const Contact = ({ contact, size = "small" }) => (
-  <TouchableOpacity
+  <ContactButton
+    activeOpacity={0.6}
     onPress={async () => {
       const localUri = await Contacts.writeContactToFileAsync({
         id: contact.id
       });
       Sharing.shareAsync(localUri);
-    }}
-    style={{
-      marginRight: 8,
-      justifyContent: "center",
-      alignItems: "center"
     }}
   >
     <Avatar
@@ -125,10 +141,10 @@ const Contact = ({ contact, size = "small" }) => (
         fontFamily: "permanent-marker"
       }}
       overlayContainerStyle={{
-        backgroundColor: Colors.tintColor
+        backgroundColor: Colors.primary["500"]
       }}
     />
-  </TouchableOpacity>
+  </ContactButton>
 );
 
 export default ({
@@ -141,41 +157,35 @@ export default ({
   const [showPicker, setShowPicker] = useState(false);
 
   useEffect(() => {
-    Promise.all(value.map(id => Contacts.getContactByIdAsync(id)))
+    Promise.all(value.map(id => DeviceContacts.getContactByIdAsync(id)))
       .then(result => setContacts(result))
       .catch(error => console.log(error));
   }, [value]);
 
   return (
-    <View
-      style={{
-        flexDirection: "row",
-        justifyContent: "flex-start",
-        alignItems: "center",
-        paddingVertical: 8
-      }}
-    >
+    <Contacts>
       {showControls && (
-        <TouchableOpacity
-          style={{ marginRight: 8 }}
+        <EditContactsButton
+          size={size}
+          activeOpacity={0.6}
           onPress={() => setShowPicker(true)}
         >
           <Icon
             size={size === "medium" ? 24 : 16}
-            name="add"
-            raised
-            color={Colors.tintColor}
+            name="plus"
+            type="feather"
+            color={Colors.primary["700"]}
           />
-        </TouchableOpacity>
+        </EditContactsButton>
       )}
       {contacts.map(contact => (
         <Contact size={size} key={contact.id} contact={contact} />
       ))}
       <Modal animationType="slide" visible={showPicker}>
-        <SafeAreaView>
+        <SafeAreaView style={{ flex: 1 }}>
           <View
             style={{
-              height: "100%",
+              flex: 1,
               paddingVertical: 24
             }}
           >
@@ -190,22 +200,43 @@ export default ({
               </ScrollView>
             )}
             <Button
+              title="Done"
+              activeOpacity={0.6}
               onPress={() => {
                 onContactsSelected(contacts.map(c => c.id));
                 setShowPicker(false);
               }}
-              buttonStyle={{
-                margin: 24,
-                backgroundColor: Colors.tintColor
-              }}
-              titleStyle={{
-                fontFamily: "overpass-black"
-              }}
-              title="Done"
+              buttonStyle={styles.doneButtonStyle}
+              titleStyle={styles.doneButtonTitleStyle}
             />
           </View>
         </SafeAreaView>
       </Modal>
-    </View>
+    </Contacts>
   );
 };
+
+const styles = StyleSheet.create({
+  listItemContainerStyles: {
+    paddingHorizontal: 16,
+    paddingVertical: 8
+  },
+  listItemTitleStyles: {
+    marginTop: 4,
+    fontFamily: "overpass-bold",
+    fontSize: 14,
+    lineHeight: 15
+  },
+  listItemSubtitleStyles: {
+    fontFamily: "overpass-regular",
+    fontSize: 12,
+    lineHeight: 13
+  },
+  doneButtonStyle: {
+    margin: 24,
+    backgroundColor: Colors.primary["500"]
+  },
+  doneButtonTitleStyle: {
+    fontFamily: "overpass-black"
+  }
+});

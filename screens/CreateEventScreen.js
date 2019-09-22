@@ -14,6 +14,7 @@ import ContactsPicker from "../components/Contacts";
 import DatesPicker from "../components/DatesPicker";
 import LocationPicker from "../components/LocationPicker";
 import Colors from "../constants/Colors";
+import useKeyboardVisible from "../hooks/keyboard-visible";
 import { createEvent, createTask } from "../graphql/mutations";
 
 const stepIsValid = async (key, value) => {
@@ -213,7 +214,7 @@ const WebsiteInput = ({ onChange, value }) => (
 const TwitterInput = ({ onChange, value }) => (
   <WizardView>
     <WizardViewQuestion>
-      What is Twitter handle for the event?
+      Is there a Twitter handle for the event?
     </WizardViewQuestion>
     <Input
       onChangeText={onChange}
@@ -278,6 +279,7 @@ export default function CreateEventScreen({ navigation }) {
     ]
   });
   const [eventData, setEventData] = useState(defaults);
+  const [keyboardVisible] = useKeyboardVisible();
 
   const onDoneButtonPressed = async () => {
     if (navigationState.index + 1 === navigationState.routes.length) {
@@ -507,6 +509,7 @@ export default function CreateEventScreen({ navigation }) {
               ]}
             />
           </Actions>
+          {keyboardVisible && <View style={{ flex: 1 }} />}
         </View>
       </View>
     </SafeAreaView>

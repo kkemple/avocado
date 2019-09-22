@@ -3,9 +3,9 @@ import {
   TouchableOpacity,
   View,
   KeyboardAvoidingView,
-  Text,
   Modal,
-  ScrollView
+  ScrollView,
+  StyleSheet
 } from "react-native";
 import { Input, Icon, ListItem } from "react-native-elements";
 import { Predictions } from "aws-amplify";
@@ -13,6 +13,7 @@ import { SafeAreaView } from "react-navigation";
 import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
+import useKeyboardVisible from "../hooks/keyboard-visible";
 
 const options = {
   en: {
@@ -89,7 +90,7 @@ const ListenButton = styled.TouchableOpacity`
   align-items: center;
   background-color: ${Colors.grey["0"]};
   border-radius: 32px;
-  bottom: 8px;
+  bottom: 16px;
   box-shadow: 1px 1px 1px ${Colors.shadow};
   height: 64px;
   justify-content: center;
@@ -99,7 +100,48 @@ const ListenButton = styled.TouchableOpacity`
   width: 64px;
 `;
 
+const Container = styled.View`
+  flex: 1;
+  padding: 24px;
+  justify-content: ${props =>
+    props.keyboardVisible ? "flex-end" : "space-around"};
+`;
+
+const LanguageOptions = styled.View`
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+  padding-horizontal: 10px;
+`;
+
+const LanguageOption = styled.TouchableOpacity`
+  flex: 3;
+  border-width: 2px;
+  border-color: ${Colors.primary["500"]};
+  border-radius: 4px;
+  padding: 8px;
+`;
+
+const LanguageOptionText = styled.Text`
+  text-align: center;
+  font-family: overpass-black;
+  color: ${Colors.primary["500"]};
+`;
+
+const LanguageContainer = styled.View`
+  justify-content: center;
+  padding: 10px;
+  flex: 1;
+`;
+
+const TranslatedText = styled.Text`
+  color: ${Colors.primary["600"]};
+  font-family: "overpass-black";
+  font-size: 28px;
+`;
+
 export default function TranslateScreen() {
+  const [keyboardVisible] = useKeyboardVisible();
   const [showFromLanguagePicker, setShowFromLanguagePicker] = useState(false);
   const [showToLanguagePicker, setShowToLanguagePicker] = useState(false);
   const [selectedFromLanguage, setSelectedFromLanguage] = useState("en");
@@ -119,7 +161,7 @@ export default function TranslateScreen() {
         }
       });
 
-      // const response = await fetch(result.speech.url, {
+      // const response = await fetch(`${result.speech.url}`, {
       //   responseType: "arrayBuffer"
       // });
 
@@ -173,189 +215,135 @@ export default function TranslateScreen() {
   ]);
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 24 }}>
-        <KeyboardAvoidingView style={{ flex: 1 }}>
-          <View style={{ flex: 5 }}>
-            <Input
-              // autoFocus
-              multiline
-              blurOnSubmit
-              returnKeyType="done"
-              value={textToTranslate}
-              onChangeText={text => setTextToTranslate(text)}
-              inputContainerStyle={{
-                padding: 8,
-                borderColor: Colors.primary["500"],
-                borderWidth: 2,
-                borderBottomWidth: 2,
-                borderRadius: 4,
-                height: "100%",
-                alignItems: "flex-start",
-                backgroundColor: Colors.primary["100"]
-              }}
-              inputStyle={{
-                fontSize: 28,
-                height: "100%",
-                color: Colors.primary["600"],
-                fontFamily: "overpass-black",
-                alignSelf: "flex-start",
-                paddingTop: 0
-              }}
-            />
-          </View>
-          <View style={{ flex: 1, justifyContent: "center" }}>
-            <View
-              style={{
-                justifyContent: "space-between",
-                alignItems: "center",
-                flexDirection: "row",
-                paddingHorizontal: 10
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => setShowFromLanguagePicker(true)}
-                style={{
-                  flex: 4,
-                  borderWidth: 2,
-                  borderColor: Colors.primary["500"],
-                  borderRadius: 4,
-                  padding: 8
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontFamily: "overpass-black",
-                    color: Colors.primary["500"]
-                  }}
-                >
-                  {options[selectedFromLanguage].title}
-                </Text>
-              </TouchableOpacity>
-              <View style={{ flex: 1, paddingHorizontal: 8 }}>
-                <Icon
-                  size={28}
-                  name="arrow-right"
-                  type="material-community"
-                  color={Colors.primary["500"]}
-                />
-              </View>
-              <TouchableOpacity
-                onPress={() => setShowToLanguagePicker(true)}
-                style={{
-                  flex: 4,
-                  borderWidth: 2,
-                  borderColor: Colors.primary["500"],
-                  borderRadius: 4,
-                  padding: 8
-                }}
-              >
-                <Text
-                  style={{
-                    textAlign: "center",
-                    fontFamily: "overpass-black",
-                    color: Colors.primary["500"]
-                  }}
-                >
-                  {options[selectedToLanguage].title}
-                </Text>
-              </TouchableOpacity>
+    <React.Fragment>
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <Container keyboardVisible={keyboardVisible}>
+            <View>
+              <Input
+                multiline
+                blurOnSubmit
+                returnKeyType="done"
+                placeholder="Translate"
+                value={textToTranslate}
+                onChangeText={text => setTextToTranslate(text)}
+                inputContainerStyle={styles.inputContainerStyle}
+                inputStyle={styles.inputStyle}
+              />
             </View>
-          </View>
-          <View style={{ flex: 5, paddingHorizontal: 10 }}>
-            <View
-              style={{
-                padding: 8,
-                borderColor: Colors.primary["500"],
-                borderWidth: 2,
-                borderBottomWidth: 2,
-                borderRadius: 4,
-                height: "100%",
-                alignItems: "flex-start",
-                backgroundColor: Colors.primary["100"]
-              }}
-            >
-              <Text
-                style={{
-                  color: Colors.primary["600"],
-                  fontFamily: "overpass-black",
-                  alignSelf: "flex-start",
-                  fontSize: 28
-                }}
-              >
-                {translatedText}
-              </Text>
+            <View>
+              <LanguageOptions>
+                <LanguageOption onPress={() => setShowFromLanguagePicker(true)}>
+                  <LanguageOptionText>
+                    {options[selectedFromLanguage].title}
+                  </LanguageOptionText>
+                </LanguageOption>
+                <View style={{ flex: 1 }}>
+                  <Icon
+                    size={28}
+                    name="arrow-right"
+                    type="material-community"
+                    color={Colors.primary["500"]}
+                  />
+                </View>
+                <LanguageOption onPress={() => setShowToLanguagePicker(true)}>
+                  <LanguageOptionText>
+                    {options[selectedToLanguage].title}
+                  </LanguageOptionText>
+                </LanguageOption>
+              </LanguageOptions>
             </View>
-            <ListenButton onPress={playAudio}>
+            <View style={{ minHeight: 200 }}>
+              <LanguageContainer>
+                <TranslatedText>{translatedText}</TranslatedText>
+              </LanguageContainer>
+            </View>
+            {keyboardVisible && <View style={{ flex: 1 }} />}
+            {/* <ListenButton onPress={playAudio}>
               <Icon
                 size={28}
                 name="ear-hearing"
                 type="material-community"
                 color={Colors.primary["500"]}
               />
-            </ListenButton>
-          </View>
-        </KeyboardAvoidingView>
-        <Modal visible={showFromLanguagePicker} animationType="slide">
-          <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ paddingVertical: 24 }}
-            >
-              {Object.keys(options).map(option => (
-                <TouchableOpacity
-                  key={option}
-                  onPress={() => {
-                    setSelectedFromLanguage(option);
-                    setShowFromLanguagePicker(false);
+            </ListenButton> */}
+          </Container>
+        </SafeAreaView>
+      </KeyboardAvoidingView>
+      <Modal visible={showFromLanguagePicker} animationType="slide">
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingVertical: 24 }}
+          >
+            {Object.keys(options).map(option => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => {
+                  setSelectedFromLanguage(option);
+                  setShowFromLanguagePicker(false);
+                }}
+              >
+                <ListItem
+                  titleStyle={{
+                    fontFamily: "overpass-black",
+                    color: Colors.primary["500"]
                   }}
-                >
-                  <ListItem
-                    titleStyle={{
-                      fontFamily: "overpass-black",
-                      color: Colors.primary["500"]
-                    }}
-                    bottomDivider
-                    title={options[option].title}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </SafeAreaView>
-        </Modal>
-        <Modal visible={showToLanguagePicker} animationType="slide">
-          <SafeAreaView style={{ flex: 1 }}>
-            <ScrollView
-              style={{ flex: 1 }}
-              contentContainerStyle={{ paddingVertical: 24 }}
-            >
-              {Object.keys(options).map(option => (
-                <TouchableOpacity
-                  key={option}
-                  onPress={() => {
-                    setSelectedToLanguage(option);
-                    setShowToLanguagePicker(false);
+                  bottomDivider
+                  title={options[option].title}
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+      <Modal visible={showToLanguagePicker} animationType="slide">
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingVertical: 24 }}
+          >
+            {Object.keys(options).map(option => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => {
+                  setSelectedToLanguage(option);
+                  setShowToLanguagePicker(false);
+                }}
+              >
+                <ListItem
+                  titleStyle={{
+                    fontFamily: "overpass-black",
+                    color: Colors.primary["500"]
                   }}
-                >
-                  <ListItem
-                    titleStyle={{
-                      fontFamily: "overpass-black",
-                      color: Colors.primary["500"]
-                    }}
-                    bottomDivider
-                    title={options[option].title}
-                  />
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-          </SafeAreaView>
-        </Modal>
-      </View>
-    </SafeAreaView>
+                  bottomDivider
+                  title={options[option].title}
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+    </React.Fragment>
   );
 }
 
 TranslateScreen.navigationOptions = {
   header: null
 };
+
+const styles = StyleSheet.create({
+  inputContainerStyle: {
+    padding: 10,
+    borderBottomWidth: 0,
+    justifyContent: "center",
+    minHeight: 200
+  },
+  inputStyle: {
+    fontSize: 28,
+    color: Colors.primary["600"],
+    fontFamily: "overpass-black",
+    alignSelf: "center",
+    paddingTop: 0
+  }
+});

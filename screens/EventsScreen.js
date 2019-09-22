@@ -1,5 +1,5 @@
-import React, { memo, useState, useEffect } from "react";
-import { View, TouchableOpacity } from "react-native";
+import React, { useCallback, useState, useEffect } from "react";
+import { View, TouchableOpacity, ActivityIndicator } from "react-native";
 import { Agenda } from "react-native-calendars";
 import styled from "@emotion/native";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -54,7 +54,20 @@ const EventDatesContainer = styled.View`
   flex-direction: row;
 `;
 
-const EmptyDate = memo(() => {
+const AgendaCurrentDate = styled.Text`
+  color: ${Colors.primary["300"]};
+  font-family: "overpass-black";
+  text-align: center;
+  margin-bottom: -2px;
+`;
+
+const AgendaCurrentDateContainer = styled.View`
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+`;
+
+const EmptyDate = () => {
   return (
     <View
       style={{
@@ -74,9 +87,9 @@ const EmptyDate = memo(() => {
       />
     </View>
   );
-});
+};
 
-const Item = memo(({ item, onPress, isFirstItem }) => (
+const Item = ({ item, onPress, isFirstItem }) => (
   <View
     style={{
       flex: 1,
@@ -100,7 +113,21 @@ const Item = memo(({ item, onPress, isFirstItem }) => (
       </View>
     </TouchableOpacity>
   </View>
-));
+);
+
+const renderItem = (item, isFirstItem, navigation) => (
+  <Item
+    item={item}
+    isFirstItem={isFirstItem}
+    activeOpacity={0.6}
+    onPress={() =>
+      navigation.navigate("EventDetail", {
+        eventId: item.event.id,
+        title: item.title
+      })
+    }
+  />
+);
 
 export default function EventsScreen({ navigation }) {
   const [user, setUser] = useState(null);
@@ -108,6 +135,11 @@ export default function EventsScreen({ navigation }) {
   const [markedDays, setMarkedDays] = useState({});
   const [activeMonth, setActiveMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
+  const [agendaDisplayDate, setAgendaDisplayDate] = useState(null);
+
+  const renderItemCall = useCallback((item, isFirstItem) =>
+    renderItem(item, isFirstItem, navigation)
+  );
 
   // activeMonth controlled by agenda component
   // fetch events for time frame
@@ -115,13 +147,14 @@ export default function EventsScreen({ navigation }) {
   // set calendar selected date
   useEffect(() => {
     const getDaysForMonth = async () => {
+      const today = new Date();
       try {
         const start = activeMonth
-          ? activeMonth
-          : startOfDay(subMonths(startOfMonth(new Date()), 1));
+          ? startOfDay(startOfMonth(subMonths(activeMonth, 3)))
+          : startOfDay(startOfMonth(subMonths(today, 3)));
         const end = activeMonth
-          ? endOfDay(endOfMonth(activeMonth))
-          : endOfDay(endOfMonth(addMonths(new Date(), 1)));
+          ? endOfDay(endOfMonth(addMonths(activeMonth, 3)))
+          : endOfDay(endOfMonth(addMonths(today, 3)));
 
         const result = await API.graphql(
           graphqlOperation(listEvents, {
@@ -440,6 +473,24 @@ export default function EventsScreen({ navigation }) {
     return () => subscription.unsubscribe();
   }, [user, setUser, calendarDays, setCalendarDays]);
 
+  useEffect(() => {
+    if (!activeMonth || agendaDisplayDate) return;
+    const displayDate = format(activeMonth, "MMMM yyyy");
+    setAgendaDisplayDate(displayDate);
+  }, [activeMonth, setActiveMonth, agendaDisplayDate, setAgendaDisplayDate]);
+
+  const onDayChange = day => {
+    const date = parse(day.dateString, "yyyy-MM-dd", new Date());
+    const displayDate = format(date, "MMMM yyyy");
+    console.log(displayDate);
+    setAgendaDisplayDate(displayDate);
+  };
+
+  const loadItemsForMonth = day => {
+    const start = startOfMonth(parse(day.dateString, "yyyy-MM-dd", new Date()));
+    setActiveMonth(start);
+  };
+
   return (
     <SafeAreaView
       style={{
@@ -465,51 +516,41 @@ export default function EventsScreen({ navigation }) {
           </View>
         )}
         {selectedDate && (
-          <Agenda
-            displayLoadingIndicator
-            selected={selectedDate}
-            markedDates={markedDays}
-            loadItemsForMonth={day => {
-              const start = startOfMonth(
-                parse(day.dateString, "yyyy-MM-dd", new Date())
-              );
-              setActiveMonth(start);
-            }}
-            items={calendarDays}
-            rowHasChanged={(r1, r2) => {
-              return r1.title !== r2.title;
-            }}
-            renderEmptyDate={() => <EmptyDate />}
-            renderItem={(item, isFirstItem) => (
-              <Item
-                isFirstItem={isFirstItem}
-                activeOpacity={0.6}
-                onPress={() =>
-                  navigation.navigate("EventDetail", {
-                    eventId: item.event.id,
-                    title: item.title
-                  })
-                }
-                item={item}
-              />
-            )}
-            theme={{
-              backgroundColor: Colors.primary["100"],
-              selectedDayBackgroundColor: Colors.primary["500"],
-              selectedDayTextColor: Colors.grey["0"],
-              todayTextColor: Colors.primary["500"],
-              dayTextColor: Colors.text,
-              textDisabledColor: Colors.primary["200"],
-              dotColor: Colors.primary["500"],
-              selectedDotColor: Colors.grey["0"],
-              monthTextColor: Colors.text,
-              indicatorColor: Colors.primary["500"],
-              agendaDayTextColor: Colors.primary["500"],
-              agendaDayNumColor: Colors.primary["500"],
-              agendaTodayColor: Colors.primary["500"],
-              agendaKnobColor: Colors.primary["200"]
-            }}
-          />
+          <View style={{ flex: 1 }}>
+            <AgendaCurrentDateContainer>
+              <AgendaCurrentDate>{agendaDisplayDate}</AgendaCurrentDate>
+            </AgendaCurrentDateContainer>
+            <Agenda
+              displayLoadingIndicator
+              selected={selectedDate}
+              markedDates={markedDays}
+              onDayChange={onDayChange}
+              onDayPress={onDayChange}
+              loadItemsForMonth={loadItemsForMonth}
+              items={calendarDays}
+              rowHasChanged={(r1, r2) => {
+                return r1.title !== r2.title;
+              }}
+              renderEmptyDate={() => <EmptyDate />}
+              renderItem={renderItemCall}
+              theme={{
+                backgroundColor: Colors.primary["100"],
+                selectedDayBackgroundColor: Colors.primary["500"],
+                selectedDayTextColor: Colors.grey["0"],
+                todayTextColor: Colors.primary["500"],
+                dayTextColor: Colors.text,
+                textDisabledColor: Colors.primary["200"],
+                dotColor: Colors.primary["500"],
+                selectedDotColor: Colors.grey["0"],
+                monthTextColor: Colors.text,
+                indicatorColor: Colors.primary["500"],
+                agendaDayTextColor: Colors.primary["500"],
+                agendaDayNumColor: Colors.primary["500"],
+                agendaTodayColor: Colors.primary["500"],
+                agendaKnobColor: Colors.primary["200"]
+              }}
+            />
+          </View>
         )}
       </View>
       <AddEventButton

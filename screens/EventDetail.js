@@ -8,7 +8,8 @@ import {
   StyleSheet,
   Text,
   TouchableOpacity,
-  View
+  View,
+  KeyboardAvoidingView
 } from "react-native";
 import styled from "@emotion/native";
 import { Button, Icon, Input } from "react-native-elements";
@@ -28,6 +29,7 @@ import Tasks from "../components/Tasks";
 import Weather from "../components/Weather";
 import { deleteEvent, updateEvent, createTask } from "../graphql/mutations";
 import useEventConnection from "../hooks/event-connection";
+import useKeyboardVisible from "../hooks/keyboard-visible";
 
 const [R, G, B] = Color(Colors.primary["200"])
   .rgb()
@@ -253,59 +255,74 @@ const Location = ({ location, title, onPress }) => {
   );
 };
 
-const TitleInput = ({ showModal, value, onChange, onCancel }) => {
+const TitleInput = ({
+  showModal,
+  value,
+  onChange,
+  onCancel,
+  keyboardVisible
+}) => {
   const [title, setTitle] = useState(value);
-
-  const TitleInputContainer = styled.View`
-    flex: 1;
-    padding: 24px;
-    justify-content: center;
-    align-items: stretch;
-    height: 100%;
-  `;
 
   return (
     <Modal visible={showModal} animationType="slide">
-      <SafeAreaView style={{ flex: 1 }}>
-        <TitleInputContainer>
-          <Input
-            value={title}
-            onChangeText={text => setTitle(text)}
-            errorMessage="Required"
-            errorStyle={styles.inputErrorStyle}
-            inputContainerStyle={styles.inputContainerContainerStyle}
-            inputStyle={styles.inputStyle}
-            containerStyle={styles.inputContainerStyle}
-          />
-          <InputActionsContainer>
-            <Button
-              type="clear"
-              title="Cancel"
-              onPress={() => {
-                setTitle(value);
-                onCancel();
-              }}
-              titleStyle={{
-                fontFamily: "overpass-bold",
-                color: Colors.inactive
-              }}
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
+            style={{
+              flex: 1,
+              padding: 24,
+              justifyContent: keyboardVisible ? "flex-end" : "center",
+              alignItems: "stretch",
+              height: "100%"
+            }}
+          >
+            <Input
+              value={title}
+              onChangeText={text => setTitle(text)}
+              errorMessage="Required"
+              errorStyle={styles.inputErrorStyle}
+              inputContainerStyle={styles.inputContainerContainerStyle}
+              inputStyle={styles.inputStyle}
+              containerStyle={styles.inputContainerStyle}
             />
-            <Button
-              title="Done"
-              onPress={() => onChange(title)}
-              titleStyle={{
-                fontFamily: "overpass-black",
-                color: Colors.grey["0"]
-              }}
-              buttonStyle={{
-                marginLeft: 16,
-                width: 100,
-                backgroundColor: Colors.primary["500"]
-              }}
-            />
-          </InputActionsContainer>
-        </TitleInputContainer>
-      </SafeAreaView>
+            <InputActionsContainer>
+              <Button
+                type="clear"
+                title="Cancel"
+                onPress={() => {
+                  setTitle(value);
+                  onCancel();
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-bold",
+                  color: Colors.inactive
+                }}
+              />
+              <Button
+                title="Done"
+                onPress={() => {
+                  if (title.length < 3) {
+                    Alert.alert("Title required!");
+                    return;
+                  }
+                  onChange(title && title.length > 0 ? title : null);
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-black",
+                  color: Colors.grey["0"]
+                }}
+                buttonStyle={{
+                  marginLeft: 16,
+                  width: 100,
+                  backgroundColor: Colors.primary["500"]
+                }}
+              />
+            </InputActionsContainer>
+          </View>
+          {keyboardVisible && <View style={{ flex: 1 }} />}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -315,243 +332,269 @@ const LocationInput = ({
   value,
   onChange,
   onCancel,
-  required = false
+  required = false,
+  keyboardVisible
 }) => {
   const [location, setLocation] = useState(value);
   return (
     <Modal visible={showModal} animationType="slide">
-      <SafeAreaView style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 1,
-            padding: 24,
-            justifyContent: "center",
-            alignItems: "stretch",
-            height: "100%"
-          }}
-        >
-          <View style={{ marginTop: "auto" }}>
-            <LocationPicker
-              autoFocus
-              title="Venue"
-              required={required}
-              onLocationSelected={newLocation => setLocation(newLocation)}
-              value={location.address}
-            />
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
+            style={{
+              flex: 1,
+              padding: 24,
+              justifyContent: keyboardVisible ? "flex-end" : "center",
+              alignItems: "stretch",
+              height: "100%"
+            }}
+          >
+            <View style={{ marginTop: "auto" }}>
+              <LocationPicker
+                autoFocus
+                title="Venue"
+                required={required}
+                onLocationSelected={newLocation => setLocation(newLocation)}
+                value={location.address}
+              />
+            </View>
+            <InputActionsContainer>
+              <Button
+                type="clear"
+                title="Cancel"
+                onPress={() => {
+                  setLocation(value);
+                  onCancel();
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-bold",
+                  color: Colors.inactive
+                }}
+              />
+              <Button
+                title="Done"
+                onPress={() => {
+                  if (required && !location) {
+                    Alert.alert("Location required");
+                    return;
+                  }
+                  onChange(location);
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-black",
+                  color: Colors.grey["0"]
+                }}
+                buttonStyle={{
+                  marginLeft: 16,
+                  width: 100,
+                  backgroundColor: Colors.primary["500"]
+                }}
+              />
+            </InputActionsContainer>
           </View>
-          <InputActionsContainer>
-            <Button
-              type="clear"
-              title="Cancel"
-              onPress={() => {
-                setLocation(value);
-                onCancel();
-              }}
-              titleStyle={{
-                fontFamily: "overpass-bold",
-                color: Colors.inactive
-              }}
-            />
-            <Button
-              title="Done"
-              onPress={() => {
-                if (required && !location) {
-                  Alert.alert("Location required");
-                  return;
-                }
-                onChange(location);
-              }}
-              titleStyle={{
-                fontFamily: "overpass-black",
-                color: Colors.grey["0"]
-              }}
-              buttonStyle={{
-                marginLeft: 16,
-                width: 100,
-                backgroundColor: Colors.primary["500"]
-              }}
-            />
-          </InputActionsContainer>
-        </View>
-      </SafeAreaView>
+          {keyboardVisible && <View style={{ flex: 1 }} />}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
 
-const ActionsInput = ({ showModal, values, onChange, onCancel }) => {
+const ActionsInput = ({
+  showModal,
+  values,
+  onChange,
+  onCancel,
+  keyboardVisible
+}) => {
   const [twitter, setTwitter] = useState(values.twitter);
   const [website, setWebsite] = useState(values.website);
   const [tickets, setTickets] = useState(values.tickets);
 
   return (
     <Modal visible={showModal} animationType="slide">
-      <SafeAreaView style={{ flex: 1 }}>
-        <View
-          style={{
-            flex: 1,
-            padding: 24,
-            justifyContent: "center",
-            alignItems: "stretch",
-            height: "100%"
-          }}
-        >
-          <Input
-            value={twitter}
-            onChangeText={text => setTwitter(text)}
-            errorMessage="Twitter"
-            errorStyle={styles.inputErrorStyle}
-            inputContainerStyle={styles.inputContainerContainerStyle}
-            inputStyle={styles.inputStyle}
-            containerStyle={styles.inputContainerStyle}
-          />
-          <Input
-            value={website}
-            errorMessage="Website"
-            onChangeText={text => setWebsite(text.toLowerCase())}
-            errorStyle={styles.inputErrorStyle}
-            inputContainerStyle={styles.inputContainerContainerStyle}
-            inputStyle={styles.inputStyle}
-            containerStyle={{ marginTop: 48 }}
-          />
-          <Input
-            value={tickets}
-            errorMessage="Tickets"
-            onChangeText={text => setTickets(text.toLowerCase())}
-            errorStyle={styles.inputErrorStyle}
-            inputContainerStyle={styles.inputContainerContainerStyle}
-            inputStyle={styles.inputStyle}
-            containerStyle={{ marginTop: 48 }}
-          />
-          <InputActionsContainer>
-            <Button
-              type="clear"
-              title="Cancel"
-              onPress={() => {
-                setTwitter(values.twitter);
-                setWebsite(values.website);
-                setTickets(values.tickets);
-                onCancel();
-              }}
-              titleStyle={{
-                fontFamily: "overpass-bold",
-                color: Colors.inactive
-              }}
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
+            style={{
+              flex: 1,
+              padding: 24,
+              justifyContent: keyboardVisible ? "flex-end" : "center",
+              alignItems: "stretch",
+              height: "100%"
+            }}
+          >
+            <Input
+              value={twitter}
+              onChangeText={text => setTwitter(text)}
+              errorMessage="Twitter"
+              errorStyle={styles.inputErrorStyle}
+              inputContainerStyle={styles.inputContainerContainerStyle}
+              inputStyle={styles.inputStyle}
+              containerStyle={styles.inputContainerStyle}
             />
-            <Button
-              title="Done"
-              onPress={() =>
-                onChange({
-                  twitter: twitter && twitter.length > 0 ? twitter : null,
-                  website: website && website.length > 0 ? website : null,
-                  tickets: tickets && tickets.length > 0 ? tickets : null
-                })
-              }
-              titleStyle={{
-                fontFamily: "overpass-black",
-                color: Colors.grey["0"]
-              }}
-              buttonStyle={{
-                marginLeft: 16,
-                width: 100,
-                backgroundColor: Colors.primary["500"]
-              }}
+            <Input
+              value={website}
+              errorMessage="Website"
+              onChangeText={text => setWebsite(text.toLowerCase())}
+              errorStyle={styles.inputErrorStyle}
+              inputContainerStyle={styles.inputContainerContainerStyle}
+              inputStyle={styles.inputStyle}
+              containerStyle={{ marginTop: 48 }}
             />
-          </InputActionsContainer>
-        </View>
-      </SafeAreaView>
+            <Input
+              value={tickets}
+              errorMessage="Tickets"
+              onChangeText={text => setTickets(text.toLowerCase())}
+              errorStyle={styles.inputErrorStyle}
+              inputContainerStyle={styles.inputContainerContainerStyle}
+              inputStyle={styles.inputStyle}
+              containerStyle={{ marginTop: 48 }}
+            />
+            <InputActionsContainer>
+              <Button
+                type="clear"
+                title="Cancel"
+                onPress={() => {
+                  setTwitter(values.twitter);
+                  setWebsite(values.website);
+                  setTickets(values.tickets);
+                  onCancel();
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-bold",
+                  color: Colors.inactive
+                }}
+              />
+              <Button
+                title="Done"
+                onPress={() =>
+                  onChange({
+                    twitter: twitter && twitter.length > 0 ? twitter : null,
+                    website: website && website.length > 0 ? website : null,
+                    tickets: tickets && tickets.length > 0 ? tickets : null
+                  })
+                }
+                titleStyle={{
+                  fontFamily: "overpass-black",
+                  color: Colors.grey["0"]
+                }}
+                buttonStyle={{
+                  marginLeft: 16,
+                  width: 100,
+                  backgroundColor: Colors.primary["500"]
+                }}
+              />
+            </InputActionsContainer>
+          </View>
+          {keyboardVisible && <View style={{ flex: 1 }} />}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
 
-const TasksForm = ({ showModal, onTaskCreated, onCancel }) => {
+const TasksForm = ({ showModal, onTaskCreated, onCancel, keyboardVisible }) => {
   const [newTask, setNewTask] = useState({});
 
   return (
     <Modal animationType="slide" visible={showModal}>
-      <SafeAreaView style={{ flex: 1 }}>
-        <View style={{ flex: 1, padding: 24 }}>
-          <Input
-            placeholder="Task title"
-            placeholderTextColor={Colors.inactive}
-            onChangeText={text =>
-              setNewTask(nt => ({
-                ...nt,
-                title: text
-              }))
-            }
-            value={newTask.title}
-            containerStyle={styles.inputContainerStyle}
-            inputStyle={styles.inputStyle}
-            inputContainerStyle={styles.inputContainerContainerStyle}
-          />
-          <Text
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <SafeAreaView style={{ flex: 1 }}>
+          <View
             style={{
-              marginTop: 32,
-              textAlign: "center",
-              fontFamily: "overpass-black",
-              color: Colors.inactive,
-              fontSize: 18
+              flex: 1,
+              padding: 24,
+              justifyContent: keyboardVisible ? "flex-end" : "center",
+              paddingTop: keyboardVisible ? 56 : 24
             }}
           >
-            Due Date
-          </Text>
-          <Calendar
-            onDayPress={day => {
-              setNewTask(nt => ({ ...nt, due: day.dateString }));
-            }}
-            markedDates={
-              newTask.due && {
-                [newTask.due]: { selected: true }
+            <Input
+              placeholder="Task title"
+              placeholderTextColor={Colors.inactive}
+              onChangeText={text =>
+                setNewTask(nt => ({
+                  ...nt,
+                  title: text
+                }))
               }
-            }
-            theme={{
-              selectedDayBackgroundColor: Colors.primary["500"],
-              selectedDayTextColor: Colors.grey["0"],
-              todayTextColor: Colors.primary["500"],
-              dayTextColor: Colors.text,
-              textDisabledColor: Colors.inactive,
-              dotColor: Colors.primary["500"],
-              selectedDotColor: Colors.grey["0"],
-              arrowColor: Colors.primary["500"],
-              monthTextColor: Colors.text,
-              indicatorColor: Colors.primary["500"],
-              textDayFontFamily: "overpass-black",
-              textMonthFontFamily: "overpass-black",
-              textDayHeaderFontFamily: "overpass-black"
-            }}
-          />
-          <InputActionsContainer>
-            <Button
-              type="clear"
-              title="Cancel"
-              onPress={() => {
-                setNewTask({});
-                onCancel();
+              value={newTask.title}
+              containerStyle={styles.inputContainerStyle}
+              inputStyle={styles.inputStyle}
+              inputContainerStyle={styles.inputContainerContainerStyle}
+            />
+            <Text
+              style={[
+                {
+                  marginTop: 32,
+                  textAlign: "center",
+                  fontFamily: "overpass-black",
+                  color: Colors.inactive,
+                  fontSize: 18
+                },
+                keyboardVisible && { display: "none" }
+              ]}
+            >
+              Due Date
+            </Text>
+            <Calendar
+              onDayPress={day => {
+                setNewTask(nt => ({ ...nt, due: day.dateString }));
               }}
-              titleStyle={{
-                fontFamily: "overpass-bold",
-                color: Colors.inactive
+              markedDates={
+                newTask.due && {
+                  [newTask.due]: { selected: true }
+                }
+              }
+              theme={{
+                selectedDayBackgroundColor: Colors.primary["500"],
+                selectedDayTextColor: Colors.grey["0"],
+                todayTextColor: Colors.primary["500"],
+                dayTextColor: Colors.text,
+                textDisabledColor: Colors.inactive,
+                dotColor: Colors.primary["500"],
+                selectedDotColor: Colors.grey["0"],
+                arrowColor: Colors.primary["500"],
+                monthTextColor: Colors.text,
+                indicatorColor: Colors.primary["500"],
+                textDayFontFamily: "overpass-black",
+                textMonthFontFamily: "overpass-black",
+                textDayHeaderFontFamily: "overpass-black"
               }}
             />
-            <Button
-              title="Done"
-              onPress={() => {
-                onTaskCreated(newTask);
-                setNewTask({});
-              }}
-              titleStyle={{
-                fontFamily: "overpass-black",
-                color: Colors.grey["0"]
-              }}
-              buttonStyle={{
-                marginLeft: 16,
-                width: 100,
-                backgroundColor: Colors.primary["500"]
-              }}
-            />
-          </InputActionsContainer>
-        </View>
-      </SafeAreaView>
+            <InputActionsContainer style={keyboardVisible && { marginTop: 16 }}>
+              <Button
+                type="clear"
+                title="Cancel"
+                onPress={() => {
+                  setNewTask({});
+                  onCancel();
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-bold",
+                  color: Colors.inactive
+                }}
+              />
+              <Button
+                title="Done"
+                onPress={() => {
+                  onTaskCreated(newTask);
+                  setNewTask({});
+                }}
+                titleStyle={{
+                  fontFamily: "overpass-black",
+                  color: Colors.grey["0"]
+                }}
+                buttonStyle={{
+                  marginLeft: 16,
+                  width: 100,
+                  backgroundColor: Colors.primary["500"]
+                }}
+              />
+            </InputActionsContainer>
+          </View>
+          {keyboardVisible && <View style={{ flex: 1 }} />}
+        </SafeAreaView>
+      </KeyboardAvoidingView>
     </Modal>
   );
 };
@@ -561,6 +604,7 @@ export default function EventDetailScreen({ navigation }) {
   const eventId = navigation.getParam("eventId");
 
   const [event] = useEventConnection(eventId);
+  const [keyboardVisible] = useKeyboardVisible();
   const [showActionBarModal, setShowActionBarModal] = useState(false);
   const [showHotelModal, setShowHotelModal] = useState(false);
   const [showTasksModal, setShowTasksModal] = useState(false);
@@ -571,7 +615,7 @@ export default function EventDetailScreen({ navigation }) {
 
   useEffect(() => {
     if (event) {
-      // setUpdating(false);
+      setUpdating(false);
     }
   }, [event]);
 
@@ -749,6 +793,7 @@ export default function EventDetailScreen({ navigation }) {
         {event && (
           <View>
             <TitleInput
+              keyboardVisible={keyboardVisible}
               value={event.title}
               showModal={showTitleModal}
               onCancel={() => setShowTitleModal(false)}
@@ -758,6 +803,7 @@ export default function EventDetailScreen({ navigation }) {
               }}
             />
             <LocationInput
+              keyboardVisible={keyboardVisible}
               value={event.venue}
               showModal={showVenueModal}
               onCancel={() => setShowVenueModal(false)}
@@ -767,6 +813,7 @@ export default function EventDetailScreen({ navigation }) {
               }}
             />
             <LocationInput
+              keyboardVisible={keyboardVisible}
               value={event.hotel}
               showModal={showHotelModal}
               onCancel={() => setShowHotelModal(false)}
@@ -776,6 +823,7 @@ export default function EventDetailScreen({ navigation }) {
               }}
             />
             <ActionsInput
+              keyboardVisible={keyboardVisible}
               values={{
                 twitter: event.twitter,
                 website: event.website,
@@ -789,6 +837,7 @@ export default function EventDetailScreen({ navigation }) {
               }}
             />
             <TasksForm
+              keyboardVisible={keyboardVisible}
               showModal={showTasksModal}
               onCancel={() => setShowTasksModal(false)}
               onTaskCreated={task => {

@@ -22,7 +22,8 @@ const config = Platform.select({
 const HomeStack = createStackNavigator(
   {
     Home: HomeScreen,
-    EventDetail: EventDetailScreen
+    EventDetail: EventDetailScreen,
+    CreateEvent: CreateEventScreen
   },
   config
 );
@@ -88,7 +89,7 @@ const tabNavigator = createBottomTabNavigator(
     SettingsStack
   },
   {
-    initialRouteName: "EventsStack",
+    initialRouteName: "HomeStack",
     tabBarOptions: {
       activeTintColor: Colors.tabIconSelected,
       inactiveTintColor: Colors.tabIconDefault,

@@ -141,10 +141,6 @@ export default function EventsScreen({ navigation }) {
     renderItem(item, isFirstItem, navigation)
   );
 
-  // activeMonth controlled by agenda component
-  // fetch events for time frame
-  // add to calendar days
-  // set calendar selected date
   useEffect(() => {
     const getDaysForMonth = async () => {
       const today = new Date();

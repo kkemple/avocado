@@ -1,17 +1,45 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, StyleSheet, View, Text } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  TouchableOpacity
+} from "react-native";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import LottieView from "lottie-react-native";
 import getTime from "date-fns/getTime";
 import startOfDay from "date-fns/startOfDay";
 import { SafeAreaView } from "react-navigation";
+import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
 import EventCard from "../components/EventCard";
 import { listEvents } from "../graphql/queries";
 import { onCreateEvent } from "../graphql/subscriptions";
 
+const NoUpcomingEventsContainer = styled.View`
+  flex: 1;
+  padding: 24px;
+  justify-content: center;
+  align-items: center;
+`;
+
+const NoUpcomingEventsTitle = styled.Text`
+  font-family: "overpass-black";
+  font-size: 24px;
+  color: ${Colors.text};
+`;
+
+const CreateEventButton = styled.TouchableOpacity`
+  background-color: ${Colors.primary["500"]};
+  padding: 8px;
+  margin: 4px;
+  border-radius: 4px;
+`;
+
 export default function HomeScreen({ navigation }) {
+  const [loaded, setLoaded] = useState(false);
   const [events, setEvents] = useState([]);
   const [sortedEvents, setSortedEvents] = useState([]);
 
@@ -29,7 +57,9 @@ export default function HomeScreen({ navigation }) {
       })
     )
       .then(result => {
-        setEvents(result.data.listEvents.items);
+        const events = result.data.listEvents.items;
+        setEvents(events);
+        setLoaded(true);
       })
       .catch(error => console.log(error));
   }, []);
@@ -60,7 +90,6 @@ export default function HomeScreen({ navigation }) {
       if (a.dates.start > b.dates.start) return 1;
       return 0;
     });
-
     setSortedEvents(sortedEvents);
   }, [events, setEvents, setSortedEvents]);
 
@@ -76,7 +105,7 @@ export default function HomeScreen({ navigation }) {
       ]}
     >
       <View style={styles.container}>
-        {!sortedEvents.length && (
+        {!sortedEvents.length && !loaded && (
           <View
             style={{
               flex: 1,
@@ -91,6 +120,25 @@ export default function HomeScreen({ navigation }) {
               source={require("../assets/lottie/lottie-events-loading.json")}
             />
           </View>
+        )}
+        {!sortedEvents.length && loaded && (
+          <NoUpcomingEventsContainer>
+            <NoUpcomingEventsTitle>No upcoming events!</NoUpcomingEventsTitle>
+
+            <CreateEventButton
+              activeOpacity={0.6}
+              onPress={() => navigation.navigate("CreateEvent")}
+            >
+              <Text
+                style={{
+                  fontFamily: "overpass-black",
+                  color: Colors.grey["0"]
+                }}
+              >
+                Create Event
+              </Text>
+            </CreateEventButton>
+          </NoUpcomingEventsContainer>
         )}
         {!!sortedEvents.length && (
           <ScrollView

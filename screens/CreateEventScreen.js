@@ -163,7 +163,10 @@ const DatesInput = ({ onDatesSelected }) => (
     <WizardViewQuestion style={{ paddingTop: 56, marginBottom: 0 }}>
       When is the event?
     </WizardViewQuestion>
-    <DatesPicker onDatesSelected={onDatesSelected} />
+    <DatesPicker
+      buttonStyle={{ height: 60 }}
+      onDatesSelected={onDatesSelected}
+    />
   </WizardView>
 );
 

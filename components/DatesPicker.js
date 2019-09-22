@@ -39,7 +39,13 @@ const DatePickerTitle = styled.Text`
   text-align: center;
 `;
 
-export default ({ onDatesSelected, value, required = true, style = {} }) => {
+export default ({
+  onDatesSelected,
+  value,
+  required = true,
+  style = {},
+  buttonStyle = {}
+}) => {
   const [showPicker, setShowPicker] = useState(false);
   const [dates, setDates] = useState(value ? [value.start, value.end] : []);
 
@@ -111,7 +117,7 @@ export default ({ onDatesSelected, value, required = true, style = {} }) => {
       <Button
         activeOpacity={0.6}
         onPress={() => setShowPicker(true)}
-        buttonStyle={styles.buttonStyles}
+        buttonStyle={[styles.buttonStyles, buttonStyle]}
         titleStyle={styles.buttonTitleStyles}
         title={dates.length === 2 ? displayDates(dates[0], dates[1]) : ""}
       />
@@ -171,7 +177,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.primary["500"],
     borderRadius: 0,
-    height: 60,
     paddingBottom: 0,
     paddingLeft: 0,
     justifyContent: "flex-start",

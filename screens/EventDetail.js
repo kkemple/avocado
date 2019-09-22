@@ -716,7 +716,7 @@ export default function EventDetailScreen({ navigation }) {
         {event && (
           <EventDatesContainer>
             <DatesPicker
-              style={{ marginTop: -24 }}
+              style={{ marginTop: -8 }}
               required={false}
               value={event.dates}
               onDatesSelected={value => {

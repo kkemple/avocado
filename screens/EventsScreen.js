@@ -478,7 +478,6 @@ export default function EventsScreen({ navigation }) {
   const onDayChange = day => {
     const date = parse(day.dateString, "yyyy-MM-dd", new Date());
     const displayDate = format(date, "MMMM yyyy");
-    console.log(displayDate);
     setAgendaDisplayDate(displayDate);
   };
 

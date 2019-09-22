@@ -1,11 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  ScrollView,
-  StyleSheet,
-  View,
-  Text,
-  TouchableOpacity
-} from "react-native";
+import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import LottieView from "lottie-react-native";
 import getTime from "date-fns/getTime";
@@ -21,21 +15,35 @@ import { onCreateEvent } from "../graphql/subscriptions";
 const NoUpcomingEventsContainer = styled.View`
   flex: 1;
   padding: 24px;
-  justify-content: center;
-  align-items: center;
+  justify-content: space-between;
+  align-items: stretch;
 `;
 
 const NoUpcomingEventsTitle = styled.Text`
   font-family: "overpass-black";
   font-size: 24px;
-  color: ${Colors.text};
+  color: ${Colors.primary["300"]};
+  text-align: center;
 `;
 
 const CreateEventButton = styled.TouchableOpacity`
   background-color: ${Colors.primary["500"]};
-  padding: 8px;
+  padding-vertical: 8px;
   margin: 4px;
   border-radius: 4px;
+`;
+
+const NoUpcomingEventsImage = styled.Image`
+  width: 200px;
+  height: 200px;
+`;
+
+const NoUpcomingEventsImageContainer = styled.View`
+  width: 200px;
+  height: 200px;
+  border-radius: 100px;
+  overflow: hidden;
+  margin-bottom: 8px;
 `;
 
 export default function HomeScreen({ navigation }) {
@@ -123,7 +131,20 @@ export default function HomeScreen({ navigation }) {
         )}
         {!sortedEvents.length && loaded && (
           <NoUpcomingEventsContainer>
-            <NoUpcomingEventsTitle>No upcoming events!</NoUpcomingEventsTitle>
+            <View
+              style={{
+                alignItems: "center",
+                marginTop: "auto",
+                marginBottom: "auto"
+              }}
+            >
+              <NoUpcomingEventsImageContainer>
+                <NoUpcomingEventsImage
+                  source={require("../assets/images/travel-bg.png")}
+                />
+              </NoUpcomingEventsImageContainer>
+              <NoUpcomingEventsTitle>No upcoming events!</NoUpcomingEventsTitle>
+            </View>
 
             <CreateEventButton
               activeOpacity={0.6}
@@ -132,7 +153,9 @@ export default function HomeScreen({ navigation }) {
               <Text
                 style={{
                   fontFamily: "overpass-black",
-                  color: Colors.grey["0"]
+                  color: Colors.grey["0"],
+                  textAlign: "center",
+                  fontSize: 20
                 }}
               >
                 Create Event

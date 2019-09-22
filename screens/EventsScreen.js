@@ -14,10 +14,10 @@ import subMonths from "date-fns/subMonths";
 import addMonths from "date-fns/addMonths";
 import getTime from "date-fns/getTime";
 import format from "date-fns/format";
-import LottieView from "lottie-react-native";
 import { SafeAreaView } from "react-navigation";
 
 import Colors from "../constants/Colors";
+import Loader from "../components/Loader";
 import { listEvents } from "../graphql/queries";
 import {
   onCreateEvent,
@@ -494,22 +494,7 @@ export default function EventsScreen({ navigation }) {
       }}
     >
       <View style={{ flex: 1 }}>
-        {!selectedDate && (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <LottieView
-              autoPlay
-              loop
-              style={{ width: 250, height: 250 }}
-              source={require("../assets/lottie/lottie-events-loading.json")}
-            />
-          </View>
-        )}
+        {!selectedDate && <Loader />}
         {selectedDate && (
           <View style={{ flex: 1 }}>
             <AgendaCurrentDateContainer>

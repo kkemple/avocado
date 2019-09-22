@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { ScrollView, StyleSheet, View, Text } from "react-native";
 import { Auth, API, graphqlOperation } from "aws-amplify";
-import LottieView from "lottie-react-native";
 import getTime from "date-fns/getTime";
 import startOfDay from "date-fns/startOfDay";
 import { SafeAreaView } from "react-navigation";
@@ -9,6 +8,7 @@ import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
 import EventCard from "../components/EventCard";
+import Loader from "../components/Loader";
 import { listEvents } from "../graphql/queries";
 import { onCreateEvent } from "../graphql/subscriptions";
 
@@ -113,22 +113,7 @@ export default function HomeScreen({ navigation }) {
       ]}
     >
       <View style={styles.container}>
-        {!sortedEvents.length && !loaded && (
-          <View
-            style={{
-              flex: 1,
-              justifyContent: "center",
-              alignItems: "center"
-            }}
-          >
-            <LottieView
-              autoPlay
-              loop
-              style={{ width: 250, height: 250 }}
-              source={require("../assets/lottie/lottie-events-loading.json")}
-            />
-          </View>
-        )}
+        {!sortedEvents.length && !loaded && <Loader />}
         {!sortedEvents.length && loaded && (
           <NoUpcomingEventsContainer>
             <View

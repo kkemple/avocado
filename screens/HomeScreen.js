@@ -1,5 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { ScrollView, StyleSheet, View, Text } from "react-native";
+import {
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+  RefreshControl
+} from "react-native";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import getTime from "date-fns/getTime";
 import startOfDay from "date-fns/startOfDay";
@@ -56,6 +62,7 @@ export default function HomeScreen({ navigation }) {
   const [events, setEvents] = useState([]);
   const [sortedEvents, setSortedEvents] = useState([]);
   const [user, setUser] = useState(null);
+  const [refreshing, setRefresing] = useState(null);
 
   useEffect(() => {
     if (!user) {
@@ -83,7 +90,7 @@ export default function HomeScreen({ navigation }) {
         setLoaded(true);
       })
       .catch(error => console.log(error));
-  }, []);
+  }, [setEvents, setLoaded]);
 
   useEffect(() => {
     const sortedEvents = events.sort((a, b) => {
@@ -140,6 +147,30 @@ export default function HomeScreen({ navigation }) {
     return () => subscription.unsubscribe();
   }, [user, setUser, events, setEvents]);
 
+  const onRefresh = async () => {
+    try {
+      setRefresing(true);
+      const timestamp = getTime(startOfDay(new Date()));
+
+      const result = await API.graphql(
+        graphqlOperation(listEvents, {
+          limit: 6,
+          filter: {
+            timestamp: {
+              ge: `${timestamp}`
+            }
+          }
+        })
+      );
+
+      setEvents(result.data.listEvents.items);
+      setRefresing(false);
+    } catch (error) {
+      console.log(error);
+      setRefresing(false);
+    }
+  };
+
   return (
     <SafeAreaView
       style={[
@@ -191,6 +222,13 @@ export default function HomeScreen({ navigation }) {
           <ScrollView
             style={styles.container}
             contentContainerStyle={styles.contentContainer}
+            refreshControl={
+              <RefreshControl
+                tintColor={Colors.primary["500"]}
+                onRefresh={onRefresh}
+                refreshing={refreshing}
+              />
+            }
           >
             {sortedEvents.map(event => (
               <EventCard

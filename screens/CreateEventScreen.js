@@ -414,6 +414,13 @@ export default function CreateEventScreen({ navigation }) {
                     <VenueInput
                       value={eventData.venue ? eventData.venue.address : ""}
                       onLocationSelected={values => {
+                        if (!values.address) {
+                          Alert.alert(
+                            "Venue seems to have no direct address, please choose another."
+                          );
+                          return;
+                        }
+
                         setEventData(event => ({ ...event, venue: values }));
                       }}
                     />

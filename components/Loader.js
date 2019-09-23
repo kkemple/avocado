@@ -4,33 +4,61 @@ import { Icon } from "react-native-elements";
 
 import Colors from "../constants/Colors";
 
+const AnimatedIcon = Animated.createAnimatedComponent(Icon);
+
 export default () => {
-  const [animatedValue] = useState(new Animated.Value(0));
+  const [pulseAnimation] = useState(new Animated.Value(0));
+  const [bounceAnimation] = useState(new Animated.Value(0));
 
   useEffect(() => {
     Animated.loop(
-      Animated.timing(animatedValue, {
+      Animated.timing(pulseAnimation, {
         toValue: 1,
         duration: 1500,
         useNativeDriver: true
       })
     ).start(() => {
-      animatedValue.setValue(0);
+      pulseAnimation.setValue(0);
     });
 
-    return () => animatedValue.stopAnimation();
-  }, [animatedValue]);
+    return () => pulseAnimation.stopAnimation();
+  }, [pulseAnimation]);
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.timing(bounceAnimation, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true
+      })
+    ).start(() => {
+      bounceAnimation.setValue(0);
+    });
+
+    return () => bounceAnimation.stopAnimation();
+  }, [bounceAnimation]);
 
   const pulseAnimationStyles = {
-    opacity: animatedValue.interpolate({
+    opacity: pulseAnimation.interpolate({
       inputRange: [0, 0.3, 0.8, 1],
       outputRange: [1, 0.5, 0.3, 0]
     }),
     transform: [
       {
-        scale: animatedValue.interpolate({
+        scale: pulseAnimation.interpolate({
           inputRange: [0, 1],
           outputRange: [1, 2]
+        })
+      }
+    ]
+  };
+
+  const bounceAnimationStyles = {
+    transform: [
+      {
+        translateY: bounceAnimation.interpolate({
+          inputRange: [0, 0.5, 1],
+          outputRange: [1, -1, 1]
         })
       }
     ]
@@ -82,7 +110,8 @@ export default () => {
             backgroundColor: Colors.grey["0"]
           }}
         >
-          <Icon
+          <AnimatedIcon
+            style={bounceAnimationStyles}
             size={24}
             name="download-cloud"
             type="feather"

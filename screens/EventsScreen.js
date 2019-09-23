@@ -1,5 +1,5 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { View, TouchableOpacity, ActivityIndicator } from "react-native";
+import { View, TouchableOpacity } from "react-native";
 import { Agenda } from "react-native-calendars";
 import styled from "@emotion/native";
 import { FontAwesome5 } from "@expo/vector-icons";
@@ -458,7 +458,7 @@ export default function EventsScreen({ navigation }) {
               mem[key] = calendarDays[key];
             }
 
-            return mem
+            return mem;
           },
           {}
         );

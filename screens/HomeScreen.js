@@ -10,7 +10,12 @@ import Colors from "../constants/Colors";
 import EventCard from "../components/EventCard";
 import Loader from "../components/Loader";
 import { listEvents } from "../graphql/queries";
-import { onCreateEvent } from "../graphql/subscriptions";
+import {
+  onCreateEvent,
+  onDeleteEvent,
+  onUpdateEvent
+} from "../graphql/subscriptions";
+import { isAfter } from "date-fns";
 
 const NoUpcomingEventsContainer = styled.View`
   flex: 1;
@@ -50,13 +55,22 @@ export default function HomeScreen({ navigation }) {
   const [loaded, setLoaded] = useState(false);
   const [events, setEvents] = useState([]);
   const [sortedEvents, setSortedEvents] = useState([]);
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    if (!user) {
+      Auth.currentAuthenticatedUser()
+        .then(user => setUser(user))
+        .catch(error => console.log(error));
+    }
+  }, [user, setUser]);
 
   useEffect(() => {
     const timestamp = getTime(startOfDay(new Date()));
 
     API.graphql(
       graphqlOperation(listEvents, {
-        limit: 5,
+        limit: 6,
         filter: {
           timestamp: {
             ge: `${timestamp}`
@@ -65,31 +79,10 @@ export default function HomeScreen({ navigation }) {
       })
     )
       .then(result => {
-        const events = result.data.listEvents.items;
-        setEvents(events);
+        setEvents(result.data.listEvents.items);
         setLoaded(true);
       })
       .catch(error => console.log(error));
-  }, []);
-
-  useEffect(() => {
-    let subscription = {
-      unsubscribe: () => {}
-    };
-
-    Auth.currentAuthenticatedUser()
-      .then(user => {
-        subscription = API.graphql(
-          graphqlOperation(onCreateEvent, { owner: user.username })
-        ).subscribe({
-          next: event => {
-            setEvents([...events, event.value.data.onCreateEvent]);
-          }
-        });
-      })
-      .catch(error => console.log(error));
-
-    return () => subscription.unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -98,8 +91,54 @@ export default function HomeScreen({ navigation }) {
       if (a.dates.start > b.dates.start) return 1;
       return 0;
     });
-    setSortedEvents(sortedEvents);
+
+    setSortedEvents(sortedEvents.slice(0, 5));
   }, [events, setEvents, setSortedEvents]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const subscription = API.graphql(
+      graphqlOperation(onCreateEvent, { owner: user.username })
+    ).subscribe({
+      next: subscription => {
+        const event = subscription.value.data.onCreateEvent;
+        setEvents([...events, event]);
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [user, setUser, events, setEvents]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const subscription = API.graphql(
+      graphqlOperation(onDeleteEvent, { owner: user.username })
+    ).subscribe({
+      next: subscription => {
+        const event = subscription.value.data.onDeleteEvent;
+        setEvents(events.filter(e => e.id !== event.id));
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [user, setUser, events, setEvents]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const subscription = API.graphql(
+      graphqlOperation(onUpdateEvent, { owner: user.username })
+    ).subscribe({
+      next: subscription => {
+        const event = subscription.value.data.onUpdateEvent;
+        setEvents(events.map(e => (e.id === event.id ? event : e)));
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [user, setUser, events, setEvents]);
 
   return (
     <SafeAreaView

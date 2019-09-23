@@ -31,10 +31,6 @@ import { deleteEvent, updateEvent, createTask } from "../graphql/mutations";
 import useEventConnection from "../hooks/event-connection";
 import useKeyboardVisible from "../hooks/keyboard-visible";
 
-const [R, G, B] = Color(Colors.primary["200"])
-  .rgb()
-  .array();
-
 const Actions = styled.View`
   align-items: center;
   flex-direction: row;
@@ -132,7 +128,8 @@ const LocationTitleContainer = styled.View`
   left: 12px;
   flex-direction: row;
   align-items: center;
-  background-color: rgba(${R}, ${G}, ${B}, 0.5);
+  // rgb of Colors.primary["200"]
+  background-color: rgba(212, 222, 249, 0.5);
   border-radius: 4px;
 `;
 

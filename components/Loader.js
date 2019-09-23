@@ -11,7 +11,7 @@ export default () => {
     Animated.loop(
       Animated.timing(animatedValue, {
         toValue: 1,
-        duration: 1000,
+        duration: 1500,
         useNativeDriver: true
       })
     ).start(() => {
@@ -23,8 +23,8 @@ export default () => {
 
   const pulseAnimationStyles = {
     opacity: animatedValue.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0]
+      inputRange: [0, 0.3, 0.8, 1],
+      outputRange: [1, 0.5, 0.3, 0]
     }),
     transform: [
       {
@@ -36,23 +36,8 @@ export default () => {
     ]
   };
 
-  const spinAnimationStyles = {
-    transform: [
-      {
-        rotate: animatedValue.interpolate({
-          inputRange: [0, 1],
-          outputRange: ["0deg", "360deg"]
-        })
-      }
-    ]
-  };
-
   return (
-    <View
-      style={{
-        flex: 1
-      }}
-    >
+    <View style={{ flex: 1 }}>
       <View
         style={{
           position: "absolute",
@@ -67,9 +52,9 @@ export default () => {
         <Animated.View
           style={[
             {
-              width: 64,
-              height: 64,
-              borderRadius: 32,
+              width: 48,
+              height: 48,
+              borderRadius: 24,
               backgroundColor: Colors.primary["500"]
             },
             pulseAnimationStyles
@@ -87,25 +72,23 @@ export default () => {
           alignItems: "center"
         }}
       >
-        <Animated.View
-          style={[
-            {
-              justifyContent: "center",
-              alignItems: "center",
-              width: 64,
-              height: 64,
-              borderRadius: 32,
-              backgroundColor: Colors.grey["0"]
-            },
-            spinAnimationStyles
-          ]}
+        <View
+          style={{
+            justifyContent: "center",
+            alignItems: "center",
+            width: 48,
+            height: 48,
+            borderRadius: 24,
+            backgroundColor: Colors.grey["0"]
+          }}
         >
           <Icon
-            name="loading"
-            type="material-community"
+            size={24}
+            name="download-cloud"
+            type="feather"
             color={Colors.primary["500"]}
           />
-        </Animated.View>
+        </View>
       </View>
     </View>
   );

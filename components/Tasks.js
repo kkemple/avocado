@@ -38,13 +38,18 @@ const Action = styled.TouchableOpacity`
   align-items: center;
 `;
 
-export default ({ tasks, showDeleteButton }) => {
+const Item = ({ task: originalTaskState, showDeleteButton }) => {
+  const [task, setTask] = useState(originalTaskState);
   const [isUpdating, setIsUpdating] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(null);
 
-  const onDelete = (id, index) => async () => {
-    if (isDeleting) return;
+  const timeTillDue = formatDistance(
+    new Date(),
+    parse(task.due, "yyyy-MM-dd", new Date())
+  );
+
+  const onDelete = async () => {
+    if (isDeleting || isUpdating) return;
 
     Alert.alert("Delete Event", "Are you sure?", [
       {
@@ -54,93 +59,92 @@ export default ({ tasks, showDeleteButton }) => {
       {
         text: "OK",
         onPress: async () => {
-          setActiveIndex(index);
           setIsDeleting(true);
+          setTask(null);
 
-          await API.graphql(
-            graphqlOperation(deleteTask, {
-              input: {
-                id
-              }
-            })
-          );
-
-          setIsDeleting(false);
-          setActiveIndex(null);
+          try {
+            await API.graphql(
+              graphqlOperation(deleteTask, {
+                input: {
+                  id: task.id
+                }
+              })
+            );
+          } catch (error) {
+            Alert.alert(error.message);
+            setTask(task);
+            setIsDeleting(false);
+          }
         }
       }
     ]);
   };
 
-  const onToggleCompleted = (id, current, index) => async () => {
-    if (isUpdating) return;
+  const onToggleCompleted = async () => {
+    if (isUpdating || isDeleting) return;
 
-    setActiveIndex(index);
     setIsUpdating(true);
+    setTask({ ...task, completed: !task.completed });
 
-    await API.graphql(
-      graphqlOperation(updateTask, {
-        input: {
-          id,
-          completed: !current
-        }
-      })
-    );
-
-    setIsUpdating(false);
-    setActiveIndex(null);
+    try {
+      await API.graphql(
+        graphqlOperation(updateTask, {
+          input: {
+            id: task.id,
+            completed: !task.completed
+          }
+        })
+      );
+      setIsUpdating(false);
+    } catch (error) {
+      Alert.alert(error.message);
+      setTask(task);
+      setIsUpdating(false);
+    }
   };
 
+  return !task ? null : (
+    <Task key={task.id}>
+      <View>
+        <TaskTitle>{task.title}</TaskTitle>
+        <TaskDueDate>Due in {timeTillDue}</TaskDueDate>
+      </View>
+      <Actions>
+        <Action activeOpacity={0.6} onPress={onToggleCompleted}>
+          {isUpdating ? (
+            <ActivityIndicator color={Colors.primary["500"]} />
+          ) : (
+            <Feather
+              name={task.completed ? "check" : "square"}
+              color={Colors.primary["500"]}
+              size={20}
+            />
+          )}
+        </Action>
+        {showDeleteButton && (
+          <Action
+            activeOpacity={0.6}
+            onPress={onDelete}
+            style={{ marginLeft: 8 }}
+          >
+            {isDeleting ? (
+              <ActivityIndicator color={Colors.primary["500"]} />
+            ) : (
+              <Feather name="delete" color={Colors.primary["500"]} size={20} />
+            )}
+          </Action>
+        )}
+      </Actions>
+    </Task>
+  );
+};
+
+export default ({ tasks, showDeleteButton }) => {
   return (
     <Tasks>
-      {tasks.map((task, index) => {
-        const timeTillDue = formatDistance(
-          new Date(),
-          parse(task.due, "yyyy-MM-dd", new Date())
-        );
-
-        return (
-          <Task key={task.id}>
-            <View>
-              <TaskTitle>{task.title}</TaskTitle>
-              <TaskDueDate>Due in {timeTillDue}</TaskDueDate>
-            </View>
-            <Actions>
-              <Action
-                activeOpacity={0.6}
-                onPress={onToggleCompleted(task.id, task.completed, index)}
-              >
-                {isUpdating && activeIndex === index ? (
-                  <ActivityIndicator color={Colors.primary["500"]} />
-                ) : (
-                  <Feather
-                    name={task.completed ? "check" : "square"}
-                    color={Colors.primary["500"]}
-                    size={20}
-                  />
-                )}
-              </Action>
-              {showDeleteButton && (
-                <Action
-                  activeOpacity={0.6}
-                  onPress={onDelete(task.id, index)}
-                  style={{ marginLeft: 8 }}
-                >
-                  {isDeleting && activeIndex === index ? (
-                    <ActivityIndicator color={Colors.primary["500"]} />
-                  ) : (
-                    <Feather
-                      name="delete"
-                      color={Colors.primary["500"]}
-                      size={20}
-                    />
-                  )}
-                </Action>
-              )}
-            </Actions>
-          </Task>
-        );
-      })}
+      {tasks.map(task => (
+        <Item key={task.id} showDeleteButton={showDeleteButton} task={task} />
+      ))}
     </Tasks>
   );
 };

@@ -282,10 +282,12 @@ export default function EventsScreen({ navigation }) {
   }, [activeMonth, setActiveMonth]);
 
   useEffect(() => {
-    Auth.currentAuthenticatedUser()
-      .then(user => setUser(user))
-      .catch(error => console.log(error));
-  }, []);
+    if (!user) {
+      Auth.currentAuthenticatedUser()
+        .then(user => setUser(user))
+        .catch(error => console.log(error));
+    }
+  }, [user, setUser]);
 
   useEffect(() => {
     if (!user) return;
@@ -455,6 +457,8 @@ export default function EventsScreen({ navigation }) {
             } else {
               mem[key] = calendarDays[key];
             }
+
+            return mem
           },
           {}
         );

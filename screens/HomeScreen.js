@@ -21,7 +21,6 @@ import {
   onDeleteEvent,
   onUpdateEvent
 } from "../graphql/subscriptions";
-import { isAfter } from "date-fns";
 
 const NoUpcomingEventsContainer = styled.View`
   flex: 1;

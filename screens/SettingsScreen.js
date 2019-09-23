@@ -59,6 +59,16 @@ export default function Settings() {
             <AttributionLink>Dark Sky</AttributionLink>
           </TouchableOpacity>
         </Attribution>
+        <Attribution>
+          <AttributionText>For bugs or feedback please submit </AttributionText>
+          <TouchableOpacity
+            onPress={() =>
+              Linking.openURL("https://github.com/kkemple/avocado/issues")
+            }
+          >
+            <AttributionLink>an issue here</AttributionLink>
+          </TouchableOpacity>
+        </Attribution>
         <Button
           onPress={() => {
             Auth.signOut();

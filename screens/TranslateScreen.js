@@ -221,6 +221,7 @@ export default function TranslateScreen() {
           <Container keyboardVisible={keyboardVisible}>
             <View>
               <Input
+                autoFocus
                 multiline
                 blurOnSubmit
                 returnKeyType="done"

@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from "react";
 import { View, TouchableOpacity } from "react-native";
 import { Agenda } from "react-native-calendars";
 import styled from "@emotion/native";
-import { FontAwesome5 } from "@expo/vector-icons";
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import eachDayOfInterval from "date-fns/eachDayOfInterval";
 import parse from "date-fns/parse";
@@ -28,6 +28,19 @@ import {
 const AddEventButton = styled.TouchableOpacity`
   position: absolute;
   bottom: 24px;
+  right: 24px;
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  background-color: ${Colors.grey["0"]};
+  justify-content: center;
+  align-items: center;
+  box-shadow: 1px 1px 1px ${Colors.shadow};
+`;
+
+const MapViewButton = styled.TouchableOpacity`
+  position: absolute;
+  bottom: 100px;
   right: 24px;
   width: 64px;
   height: 64px;
@@ -547,6 +560,16 @@ export default function EventsScreen({ navigation }) {
           size={24}
         />
       </AddEventButton>
+      <MapViewButton
+        activeOpacity={0.6}
+        onPress={() => navigation.navigate("EventsMap")}
+      >
+        <MaterialCommunityIcons
+          name="map-marker-multiple"
+          color={Colors.primary["500"]}
+          size={30}
+        />
+      </MapViewButton>
     </SafeAreaView>
   );
 }

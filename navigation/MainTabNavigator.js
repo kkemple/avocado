@@ -13,6 +13,7 @@ import TranslateScreen from "../screens/TranslateScreen";
 import SettingsScreen from "../screens/SettingsScreen";
 import Colors from "../constants/Colors";
 import EventDetailScreen from "../screens/EventDetail";
+import EventsMapScreen from "../screens/EventsMapScreen";
 
 const config = Platform.select({
   web: { headerMode: "screen" },
@@ -41,7 +42,8 @@ const EventsStack = createStackNavigator(
   {
     Events: EventsScreen,
     CreateEvent: CreateEventScreen,
-    EventDetail: EventDetailScreen
+    EventDetail: EventDetailScreen,
+    EventsMap: EventsMapScreen
   },
   { ...config, initialRouteName: "Events" }
 );

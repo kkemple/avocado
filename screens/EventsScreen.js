@@ -38,19 +38,6 @@ const AddEventButton = styled.TouchableOpacity`
   box-shadow: 1px 1px 1px ${Colors.shadow};
 `;
 
-const MapViewButton = styled.TouchableOpacity`
-  position: absolute;
-  bottom: 100px;
-  right: 24px;
-  width: 64px;
-  height: 64px;
-  border-radius: 32px;
-  background-color: ${Colors.grey["0"]};
-  justify-content: center;
-  align-items: center;
-  box-shadow: 1px 1px 1px ${Colors.shadow};
-`;
-
 const EventTitle = styled.Text`
   color: ${Colors.grey["0"]};
   font-size: 20px;
@@ -560,16 +547,6 @@ export default function EventsScreen({ navigation }) {
           size={24}
         />
       </AddEventButton>
-      <MapViewButton
-        activeOpacity={0.6}
-        onPress={() => navigation.navigate("EventsMap")}
-      >
-        <MaterialCommunityIcons
-          name="map-marker-multiple"
-          color={Colors.primary["500"]}
-          size={30}
-        />
-      </MapViewButton>
     </SafeAreaView>
   );
 }

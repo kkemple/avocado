@@ -42,8 +42,7 @@ const EventsStack = createStackNavigator(
   {
     Events: EventsScreen,
     CreateEvent: CreateEventScreen,
-    EventDetail: EventDetailScreen,
-    EventsMap: EventsMapScreen
+    EventDetail: EventDetailScreen
   },
   { ...config, initialRouteName: "Events" }
 );
@@ -54,6 +53,21 @@ EventsStack.navigationOptions = {
 };
 
 EventsStack.path = "";
+
+const MapStack = createStackNavigator(
+  {
+    Map: EventsMapScreen,
+    EventDetail: EventDetailScreen
+  },
+  { ...config, initialRouteName: "Map" }
+);
+
+MapStack.navigationOptions = {
+  tabBarLabel: "Map",
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="map" />
+};
+
+MapStack.path = "";
 
 const TranslateStack = createStackNavigator(
   {
@@ -86,6 +100,7 @@ SettingsStack.path = "";
 const tabNavigator = createBottomTabNavigator(
   {
     HomeStack,
+    MapStack,
     EventsStack,
     TranslateStack,
     SettingsStack

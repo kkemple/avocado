@@ -139,7 +139,7 @@ async function loadResourcesAsync() {
       ...Feather.font,
       // We include SpaceMono because we use it in HomeScreen.js. Feel free to
       // remove this if you are not using it in your app
-      "permanent-marker": require("./assets/fonts/PermanentMarker-Regular.ttf"),
+      "permanent-marker": require("./assets/fonts/Montserrat-Black.ttf"),
       "overpass-regular": require("./assets/fonts/Overpass-Regular.ttf"),
       "overpass-light": require("./assets/fonts/Overpass-Light.ttf"),
       "overpass-bold": require("./assets/fonts/Overpass-Bold.ttf"),

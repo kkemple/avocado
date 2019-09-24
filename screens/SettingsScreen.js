@@ -46,7 +46,7 @@ export default function Settings() {
           </TouchableOpacity>
         </Attribution>
         <Attribution>
-          <AttributionText>A React Native app using with </AttributionText>
+          <AttributionText>Built on React Native & </AttributionText>
           <TouchableOpacity onPress={() => Linking.openURL("https://expo.io")}>
             <AttributionLink>Expo</AttributionLink>
           </TouchableOpacity>
@@ -60,13 +60,12 @@ export default function Settings() {
           </TouchableOpacity>
         </Attribution>
         <Attribution>
-          <AttributionText>For bugs or feedback please submit </AttributionText>
           <TouchableOpacity
             onPress={() =>
               Linking.openURL("https://github.com/kkemple/avocado/issues")
             }
           >
-            <AttributionLink>an issue here</AttributionLink>
+            <AttributionLink>Bugs or Feedback</AttributionLink>
           </TouchableOpacity>
         </Attribution>
         <Button

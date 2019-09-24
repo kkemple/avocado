@@ -38,27 +38,20 @@ const EventTitle = styled.Text`
   color: ${Colors.grey["0"]};
   font-size: 20px;
   font-family: "permanent-marker";
+  line-height: 20px;
 `;
 
 const EventDates = styled.Text`
   color: ${Colors.grey["0"]};
   font-family: "overpass-bold";
-  font-size: 14px;
+  font-size: 12px;
 `;
 
 const EventDatesContainer = styled.View`
   flex-direction: row;
 `;
 
-const BackButton = styled.TouchableOpacity`
-  position: absolute;
-  top: 48px;
-  left: 16px;
-  justify-content: center;
-  align-items: center;
-`;
-
-const Item = ({ event, onPress, width }) => {
+const Item = ({ event, onPress, width, style }) => {
   const start = parse(event.dates.start, "yyyy-MM-dd", new Date());
   const end = parse(event.dates.end, "yyyy-MM-dd", new Date());
 
@@ -67,11 +60,7 @@ const Item = ({ event, onPress, width }) => {
   const eventInPast = isBefore(start, new Date());
 
   return (
-    <View
-      style={{
-        width
-      }}
-    >
+    <Animated.View style={[{ width }, style]}>
       <TouchableOpacity
         activeOpacity={0.6}
         style={{
@@ -103,7 +92,7 @@ const Item = ({ event, onPress, width }) => {
           )}
         </EventDatesContainer>
       </TouchableOpacity>
-    </View>
+    </Animated.View>
   );
 };
 
@@ -119,6 +108,24 @@ export default function EventsMapScreen({ navigation }) {
   const mapView = useRef();
   const timeout = useRef();
   const scrollView = createRef();
+
+  const updateCamera = async (event, animate) => {
+    const camera = await mapView.current.getCamera();
+    camera.center.latitude = event.venue.location.lat;
+    camera.center.longitude = event.venue.location.lng;
+    camera.pitch = 45;
+    camera.heading = 0;
+    camera.altitude = 10000;
+    camera.zoom = 3;
+
+    if (animate) {
+      mapView.current.animateCamera(camera, {
+        duration: 500
+      });
+    } else {
+      mapView.current.setCamera(camera);
+    }
+  };
 
   useEffect(() => {
     API.graphql(graphqlOperation(listEvents))
@@ -143,18 +150,27 @@ export default function EventsMapScreen({ navigation }) {
     if (firstUpcomingEventFound || !sortedEvents.length || !scrollView.current)
       return;
 
-    const today = new Date();
-    const index = sortedEvents.findIndex(
-      event =>
-        !isBefore(parse(event.dates.start, "yyyy-MM-dd", new Date()), today)
-    );
+    const setFirstUpcomingEvent = async () => {
+      try {
+        const today = new Date();
+        const index = sortedEvents.findIndex(
+          event =>
+            !isBefore(parse(event.dates.start, "yyyy-MM-dd", new Date()), today)
+        );
 
-    scrollView.current.scrollTo({ x: CARD_WIDTH * index, animated: false });
+        updateCamera(sortedEvents[index], false);
+        scrollView.current
+          .getNode()
+          .scrollTo({ x: CARD_WIDTH * index, animated: false });
 
-    setTimeout(() => {
-      setIndex(index);
-      setFirstUpcomingEventFound(true);
-    }, 0);
+        setIndex(index);
+        setFirstUpcomingEventFound(true);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    setFirstUpcomingEvent();
   }, [
     index,
     scrollView,
@@ -165,42 +181,26 @@ export default function EventsMapScreen({ navigation }) {
   ]);
 
   useEffect(() => {
-    if (!sortedEvents.length || !mapView.current) return;
+    const listenerId = animation.addListener(({ value }) => {
+      if (timeout.current) clearTimeout(timeout.current);
 
-    const updateCamera = async () => {
-      const camera = await mapView.current.getCamera();
-      camera.center.latitude = sortedEvents[index].venue.location.lat;
-      camera.center.longitude = sortedEvents[index].venue.location.lng;
-      camera.pitch = 45;
-      camera.heading = 0;
-      camera.altitude = 10000;
-      camera.zoom = 3;
+      timeout.current = setTimeout(() => {
+        let index = Math.floor(value / CARD_WIDTH + 0.3);
 
-      mapView.current.animateCamera(camera, { duration: 500 });
-    };
+        if (index >= sortedEvents.length) {
+          index = sortedEvents.length - 1;
+        }
+        if (index <= 0) {
+          index = 0;
+        }
 
-    updateCamera();
-  }, [index, sortedEvents]);
+        updateCamera(sortedEvents[index], true);
+        setIndex(index);
+      }, 10);
+    });
 
-  const handleScroll = event => {
-    if (timeout.current) clearTimeout(timeout.current);
-
-    const value = event.nativeEvent.contentOffset.x;
-
-    timeout.current = setTimeout(() => {
-      let index = Math.floor(value / CARD_WIDTH + 0.3);
-
-      if (index >= sortedEvents.length) {
-        index = sortedEvents.length - 1;
-      }
-      if (index <= 0) {
-        index = 0;
-      }
-
-      setIndex(index);
-      animation.setValue(index);
-    }, 150);
-  };
+    return () => animation.removeListener(listenerId);
+  }, [animation, sortedEvents, setIndex]);
 
   return !loaded ? (
     <Loader />
@@ -235,7 +235,11 @@ export default function EventsMapScreen({ navigation }) {
             {sortedEvents.map((event, eventIndex) => {
               const opacityStyles = {
                 opacity: animation.interpolate({
-                  inputRange: [eventIndex - 1, eventIndex, eventIndex + 1],
+                  inputRange: [
+                    (eventIndex - 1) * CARD_WIDTH,
+                    eventIndex * CARD_WIDTH,
+                    (eventIndex + 1) * CARD_WIDTH
+                  ],
                   outputRange: [0.75, 1, 0.75],
                   extrapolate: "clamp"
                 })
@@ -245,7 +249,11 @@ export default function EventsMapScreen({ navigation }) {
                 transform: [
                   {
                     scale: animation.interpolate({
-                      inputRange: [eventIndex - 1, eventIndex, eventIndex + 1],
+                      inputRange: [
+                        (eventIndex - 1) * CARD_WIDTH,
+                        eventIndex * CARD_WIDTH,
+                        (eventIndex + 1) * CARD_WIDTH
+                      ],
                       outputRange: [0.75, 1, 0.75],
                       extrapolate: "clamp"
                     })
@@ -273,15 +281,25 @@ export default function EventsMapScreen({ navigation }) {
               );
             })}
           </MapView>
-          <ScrollView
+          <Animated.ScrollView
             ref={scrollView}
             horizontal
-            pagingEnabled
             scrollEventThrottle={16}
             showsHorizontalScrollIndicator={false}
             snapToInterval={CARD_WIDTH}
-            onScroll={handleScroll}
             decelerationRate="fast"
+            onScroll={Animated.event(
+              [
+                {
+                  nativeEvent: {
+                    contentOffset: {
+                      x: animation
+                    }
+                  }
+                }
+              ],
+              { useNativeDriver: true }
+            )}
             style={{
               position: "absolute",
               bottom: 30,
@@ -294,27 +312,48 @@ export default function EventsMapScreen({ navigation }) {
               alignItems: "stretch"
             }}
           >
-            {sortedEvents.map(event => (
-              <Item
-                key={event.id}
-                event={event}
-                width={CARD_WIDTH}
-                onPress={() => {
-                  navigation.navigate("EventDetail", {
-                    eventId: event.id,
-                    title: event.title
-                  });
-                }}
-              />
-            ))}
-          </ScrollView>
-          <BackButton onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons
-              name="arrow-left"
-              size={30}
-              color={Colors.grey["0"]}
-            />
-          </BackButton>
+            {sortedEvents.map((event, eventIndex) => {
+              const animationStyles = {
+                opacity: animation.interpolate({
+                  inputRange: [
+                    (eventIndex - 1) * CARD_WIDTH,
+                    eventIndex * CARD_WIDTH,
+                    (eventIndex + 1) * CARD_WIDTH
+                  ],
+                  outputRange: [0.8, 1, 0.8],
+                  extrapolate: "clamp"
+                }),
+                transform: [
+                  {
+                    scale: animation.interpolate({
+                      inputRange: [
+                        (eventIndex - 1) * CARD_WIDTH,
+                        eventIndex * CARD_WIDTH,
+                        (eventIndex + 1) * CARD_WIDTH
+                      ],
+                      outputRange: [1, 1.1, 1],
+                      extrapolate: "clamp"
+                    })
+                  }
+                ]
+              };
+
+              return (
+                <Item
+                  style={animationStyles}
+                  key={event.id}
+                  event={event}
+                  width={CARD_WIDTH}
+                  onPress={() => {
+                    navigation.navigate("EventDetail", {
+                      eventId: event.id,
+                      title: event.title
+                    });
+                  }}
+                />
+              );
+            })}
+          </Animated.ScrollView>
         </React.Fragment>
       )}
     </View>

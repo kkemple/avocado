@@ -30,7 +30,7 @@ const NoUpcomingEventsContainer = styled.View`
 `;
 
 const NoUpcomingEventsTitle = styled.Text`
-  font-family: "overpass-black";
+  font-family: "montserrat-extra-bold";
   font-size: 24px;
   color: ${Colors.primary["300"]};
   text-align: center;
@@ -206,7 +206,7 @@ export default function HomeScreen({ navigation }) {
             >
               <Text
                 style={{
-                  fontFamily: "overpass-black",
+                  fontFamily: "montserrat-extra-bold",
                   color: Colors.grey["0"],
                   textAlign: "center",
                   fontSize: 20

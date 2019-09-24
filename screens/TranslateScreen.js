@@ -124,7 +124,7 @@ const LanguageOption = styled.TouchableOpacity`
 
 const LanguageOptionText = styled.Text`
   text-align: center;
-  font-family: overpass-black;
+  font-family: montserrat-extra-bold;
   color: ${Colors.primary["500"]};
 `;
 
@@ -136,7 +136,7 @@ const LanguageContainer = styled.View`
 
 const TranslatedText = styled.Text`
   color: ${Colors.primary["600"]};
-  font-family: "overpass-black";
+  font-family: "montserrat-black";
   font-size: 28px;
 `;
 
@@ -287,7 +287,7 @@ export default function TranslateScreen() {
               >
                 <ListItem
                   titleStyle={{
-                    fontFamily: "overpass-black",
+                    fontFamily: "montserrat-extra-bold",
                     color: Colors.primary["500"]
                   }}
                   bottomDivider
@@ -314,7 +314,7 @@ export default function TranslateScreen() {
               >
                 <ListItem
                   titleStyle={{
-                    fontFamily: "overpass-black",
+                    fontFamily: "montserrat-extra-bold",
                     color: Colors.primary["500"]
                   }}
                   bottomDivider
@@ -343,7 +343,7 @@ const styles = StyleSheet.create({
   inputStyle: {
     fontSize: 28,
     color: Colors.primary["600"],
-    fontFamily: "overpass-black",
+    fontFamily: "montserrat-black",
     alignSelf: "center",
     paddingTop: 0
   }

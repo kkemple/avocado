@@ -41,7 +41,7 @@ const Actions = styled.View`
 
 const Title = styled.Text`
   color: ${Colors.text};
-  font-family: "permanent-marker";
+  font-family: "montserrat-black";
   font-size: 28px;
 `;
 
@@ -134,7 +134,7 @@ const LocationTitleContainer = styled.View`
 `;
 
 const LocationTitleText = styled.Text`
-  font-family: "permanent-marker";
+  font-family: "montserrat-black";
   font-size: 18px;
   padding-horizontal: 8px;
   padding-vertical: 4px;
@@ -152,10 +152,9 @@ const EmptyLocation = styled.View`
 `;
 
 const AddTaskButtonText = styled.Text`
-  margin-bottom: -5px;
   font-size: 18px;
   color: ${Colors.primary["500"]};
-  font-family: "overpass-black";
+  font-family: "montserrat-extra-bold";
 `;
 
 const InputActionsContainer = styled.View`
@@ -292,7 +291,7 @@ const TitleInput = ({
                   onCancel();
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-bold",
+                  fontFamily: "montserrat-bold",
                   color: Colors.inactive
                 }}
               />
@@ -306,7 +305,7 @@ const TitleInput = ({
                   onChange(title && title.length > 0 ? title : null);
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-black",
+                  fontFamily: "montserrat-extra-bold",
                   color: Colors.grey["0"]
                 }}
                 buttonStyle={{
@@ -364,7 +363,7 @@ const LocationInput = ({
                   onCancel();
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-bold",
+                  fontFamily: "montserrat-bold",
                   color: Colors.inactive
                 }}
               />
@@ -378,7 +377,7 @@ const LocationInput = ({
                   onChange(location);
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-black",
+                  fontFamily: "montserrat-extra-bold",
                   color: Colors.grey["0"]
                 }}
                 buttonStyle={{
@@ -458,7 +457,7 @@ const ActionsInput = ({
                   onCancel();
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-bold",
+                  fontFamily: "montserrat-bold",
                   color: Colors.inactive
                 }}
               />
@@ -472,7 +471,7 @@ const ActionsInput = ({
                   })
                 }
                 titleStyle={{
-                  fontFamily: "overpass-black",
+                  fontFamily: "montserrat-extra-bold",
                   color: Colors.grey["0"]
                 }}
                 buttonStyle={{
@@ -524,7 +523,7 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel, keyboardVisible }) => {
                 {
                   marginTop: 32,
                   textAlign: "center",
-                  fontFamily: "overpass-black",
+                  fontFamily: "montserrat-extra-bold",
                   color: Colors.inactive,
                   fontSize: 18
                 },
@@ -553,9 +552,9 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel, keyboardVisible }) => {
                 arrowColor: Colors.primary["500"],
                 monthTextColor: Colors.text,
                 indicatorColor: Colors.primary["500"],
-                textDayFontFamily: "overpass-black",
-                textMonthFontFamily: "overpass-black",
-                textDayHeaderFontFamily: "overpass-black"
+                textDayFontFamily: "montserrat-extra-bold",
+                textMonthFontFamily: "montserrat-extra-bold",
+                textDayHeaderFontFamily: "montserrat-extra-bold"
               }}
             />
             <InputActionsContainer style={keyboardVisible && { marginTop: 16 }}>
@@ -567,7 +566,7 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel, keyboardVisible }) => {
                   onCancel();
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-bold",
+                  fontFamily: "montserrat-bold",
                   color: Colors.inactive
                 }}
               />
@@ -578,7 +577,7 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel, keyboardVisible }) => {
                   setNewTask({});
                 }}
                 titleStyle={{
-                  fontFamily: "overpass-black",
+                  fontFamily: "montserrat-extra-bold",
                   color: Colors.grey["0"]
                 }}
                 buttonStyle={{
@@ -689,7 +688,7 @@ export default function EventDetailScreen({ navigation }) {
             onPress={() => navigation.goBack()}
             containerStyle={{ marginTop: 6, marginRight: "auto" }}
             titleStyle={{
-              fontFamily: "overpass-bold",
+              fontFamily: "montserrat-bold",
               color: Colors.inactive
             }}
             type="clear"
@@ -864,6 +863,6 @@ const styles = StyleSheet.create({
   inputStyle: {
     fontSize: 24,
     color: Colors.primary["500"],
-    fontFamily: "overpass-black"
+    fontFamily: "montserrat-extra-bold"
   }
 });

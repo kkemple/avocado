@@ -37,13 +37,13 @@ const getTimeToEvent = startDate => {
 const EventTitle = styled.Text`
   color: ${Colors.grey["0"]};
   font-size: 20px;
-  font-family: "permanent-marker";
+  font-family: "montserrat-black";
   line-height: 20px;
 `;
 
 const EventDates = styled.Text`
   color: ${Colors.grey["0"]};
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
   font-size: 12px;
 `;
 

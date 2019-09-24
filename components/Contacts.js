@@ -138,7 +138,7 @@ const Contact = ({ contact, size = "small" }) => (
       title={contact.image ? "" : buildTitle(contact)}
       source={contact.image ? { uri: contact.image } : null}
       titleStyle={{
-        fontFamily: "permanent-marker"
+        fontFamily: "montserrat-black"
       }}
       overlayContainerStyle={{
         backgroundColor: Colors.primary["500"]
@@ -223,12 +223,12 @@ const styles = StyleSheet.create({
   },
   listItemTitleStyles: {
     marginTop: 4,
-    fontFamily: "overpass-bold",
+    fontFamily: "montserrat-bold",
     fontSize: 14,
     lineHeight: 15
   },
   listItemSubtitleStyles: {
-    fontFamily: "overpass-regular",
+    fontFamily: "montserrat-regular",
     fontSize: 12,
     lineHeight: 13
   },
@@ -237,6 +237,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary["500"]
   },
   doneButtonTitleStyle: {
-    fontFamily: "overpass-black"
+    fontFamily: "montserrat-extra-bold"
   }
 });

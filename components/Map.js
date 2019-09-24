@@ -24,8 +24,7 @@ const CurrentMapLocation = styled.View`
   flex-direction: row;
   justify-content: center;
   margin: 8px;
-  padding-bottom: 4px;
-  padding-top: 6px;
+  padding-vertical: 8px;
   width: 100px;
 `;
 
@@ -62,7 +61,7 @@ const CurrentLocationButton = styled.TouchableOpacity`
 const CurrentLocationButtonText = styled.Text`
   color: ${props =>
     props.active ? Colors.primary["500"] : Colors.primary["200"]};
-  font-family: "overpass-black";
+  font-family: "montserrat-extra-bold";
   font-size: 10px;
 `;
 

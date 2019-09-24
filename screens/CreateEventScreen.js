@@ -97,7 +97,7 @@ const errors = {
 };
 
 const Title = styled.Text`
-  font-family: "permanent-marker";
+  font-family: "montserrat-extra-bold";
   font-size: 28px;
   color: ${Colors.text};
 `;
@@ -109,7 +109,7 @@ const WizardView = styled.View`
 `;
 
 const WizardViewQuestion = styled.Text`
-  font-family: "overpass-regular";
+  font-family: "montserrat-bold";
   font-size: 36px;
   margin-bottom: 16px;
   color: ${Colors.primary["500"]};
@@ -152,7 +152,7 @@ const TitleInput = ({ onChange, value }) => (
       inputStyle={{
         fontSize: 24,
         color: Colors.primary["500"],
-        fontFamily: "overpass-bold"
+        fontFamily: "montserrat-bold"
       }}
     />
   </WizardView>
@@ -208,7 +208,7 @@ const WebsiteInput = ({ onChange, value }) => (
       inputStyle={{
         fontSize: 24,
         color: Colors.primary["500"],
-        fontFamily: "overpass-bold"
+        fontFamily: "montserrat-bold"
       }}
     />
   </WizardView>
@@ -229,7 +229,7 @@ const TwitterInput = ({ onChange, value }) => (
       inputStyle={{
         fontSize: 24,
         color: Colors.primary["500"],
-        fontFamily: "overpass-bold"
+        fontFamily: "montserrat-bold"
       }}
     />
   </WizardView>
@@ -248,7 +248,7 @@ const TicketsInput = ({ onChange, value }) => (
       inputStyle={{
         fontSize: 24,
         color: Colors.primary["500"],
-        fontFamily: "overpass-bold"
+        fontFamily: "montserrat-bold"
       }}
     />
   </WizardView>
@@ -532,11 +532,11 @@ CreateEventScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   backButtonTitleStyles: {
-    fontFamily: "overpass-bold",
+    fontFamily: "montserrat-bold",
     color: Colors.inactive
   },
   cancelButtonTitleStyles: {
-    fontFamily: "overpass-bold",
+    fontFamily: "montserrat-bold",
     color: Colors.inactive
   },
   cancelButtonStyles: {
@@ -549,6 +549,6 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary["500"]
   },
   doneButtonTitleStyles: {
-    fontFamily: "overpass-black"
+    fontFamily: "montserrat-extra-bold"
   }
 });

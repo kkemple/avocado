@@ -54,17 +54,17 @@ const theme = {
       ...AmplifyTheme.input,
       color: Colors.primary["500"],
       borderColor: Colors.primary["500"],
-      fontFamily: "overpass-bold"
+      fontFamily: "montserrat-bold"
     },
     inputLabel: {
       ...AmplifyTheme.inputLabel,
       color: Colors.primary["500"],
-      fontFamily: "overpass-bold"
+      fontFamily: "montserrat-bold"
     },
     sectionHeaderText: {
       ...AmplifyTheme.sectionHeaderText,
       color: Colors.primary["500"],
-      fontFamily: "permanent-marker"
+      fontFamily: "montserrat-black"
     },
     greetingMessage: {
       color: Colors.primary["500"]
@@ -139,11 +139,11 @@ async function loadResourcesAsync() {
       ...Feather.font,
       // We include SpaceMono because we use it in HomeScreen.js. Feel free to
       // remove this if you are not using it in your app
-      "permanent-marker": require("./assets/fonts/Montserrat-Black.ttf"),
-      "overpass-regular": require("./assets/fonts/Overpass-Regular.ttf"),
-      "overpass-light": require("./assets/fonts/Overpass-Light.ttf"),
-      "overpass-bold": require("./assets/fonts/Overpass-Bold.ttf"),
-      "overpass-black": require("./assets/fonts/Overpass-Black.ttf")
+      "montserrat-black": require("./assets/fonts/Montserrat-Black.ttf"),
+      "montserrat-regular": require("./assets/fonts/Montserrat-Regular.ttf"),
+      "montserrat-light": require("./assets/fonts/Montserrat-Light.ttf"),
+      "montserrat-bold": require("./assets/fonts/Montserrat-Bold.ttf"),
+      "montserrat-extra-bold": require("./assets/fonts/Montserrat-ExtraBold.ttf")
     })
   ]);
 }

@@ -2,8 +2,6 @@
 
 An app for managing your future engagements. Easily figure out what your upcoming iteneray is including the weather forecast for the weeek of the event, as well as tracking any tasks you may need to get done before you head off, and realtime translations to over a dozen languages.
 
-![](./assets/images/avocado-screen-flow.png)
-
 ## Infrastructure
 
 ### Authentication

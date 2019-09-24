@@ -40,14 +40,14 @@ const AddEventButton = styled.TouchableOpacity`
 
 const EventTitle = styled.Text`
   color: ${Colors.grey["0"]};
-  font-size: 20px;
-  font-family: "permanent-marker";
+  font-size: 18px;
+  font-family: "montserrat-extra-bold";
 `;
 
 const EventDates = styled.Text`
   color: ${Colors.grey["0"]};
-  font-family: "overpass-bold";
-  font-size: 14px;
+  font-family: "montserrat-bold";
+  font-size: 12px;
 `;
 
 const EventDatesContainer = styled.View`
@@ -56,7 +56,7 @@ const EventDatesContainer = styled.View`
 
 const AgendaCurrentDate = styled.Text`
   color: ${Colors.primary["300"]};
-  font-family: "overpass-black";
+  font-family: "montserrat-extra-bold";
   text-align: center;
   margin-bottom: -2px;
 `;
@@ -94,7 +94,7 @@ const Item = ({ item, onPress, isFirstItem }) => (
     style={{
       flex: 1,
       marginRight: 24,
-      marginTop: isFirstItem ? 24 : 16
+      marginTop: isFirstItem ? 28 : 20
     }}
   >
     <TouchableOpacity activeOpacity={0.6} onPress={onPress}>
@@ -102,7 +102,8 @@ const Item = ({ item, onPress, isFirstItem }) => (
         style={{
           backgroundColor: Colors.primary["500"],
           paddingHorizontal: 16,
-          paddingVertical: 8,
+          paddingTop: 8,
+          paddingBottom: 16,
           borderRadius: 4
         }}
       >
@@ -531,7 +532,10 @@ export default function EventsScreen({ navigation }) {
                 agendaDayTextColor: Colors.primary["500"],
                 agendaDayNumColor: Colors.primary["500"],
                 agendaTodayColor: Colors.primary["500"],
-                agendaKnobColor: Colors.primary["200"]
+                agendaKnobColor: Colors.primary["200"],
+                textDayFontFamily: "montserrat-regular",
+                textMonthFontFamily: "montserrat-bold",
+                textDayHeaderFontFamily: "montserrat-bold"
               }}
             />
           </View>

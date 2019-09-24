@@ -16,12 +16,12 @@ const Attribution = styled.View`
 `;
 
 const AttributionText = styled.Text`
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
   color: ${Colors.text};
 `;
 
 const AttributionLink = styled.Text`
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
   color: ${Colors.primary["500"]};
 `;
 
@@ -77,7 +77,7 @@ export default function Settings() {
             backgroundColor: Colors.primary["500"]
           }}
           titleStyle={{
-            fontFamily: "overpass-black"
+            fontFamily: "montserrat-extra-bold"
           }}
           title="Log Out"
         />

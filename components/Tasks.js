@@ -21,11 +21,12 @@ const Task = styled.View`
 `;
 
 const TaskTitle = styled.Text`
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
 `;
 
 const TaskDueDate = styled.Text`
   color: ${Colors.primary["600"]};
+  font-family: "montserrat-regular";
 `;
 
 const Actions = styled.View`

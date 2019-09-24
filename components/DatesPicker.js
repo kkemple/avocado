@@ -14,15 +14,18 @@ const calendarTheme = {
   selectedDayTextColor: Colors.grey["0"],
   todayTextColor: Colors.primary["500"],
   dayTextColor: Colors.text,
-  textDisabledColor: Colors.inactive,
+  textDisabledColor: Colors.primary["200"],
   dotColor: Colors.primary["500"],
   selectedDotColor: Colors.grey["0"],
-  arrowColor: Colors.primary["500"],
   monthTextColor: Colors.text,
   indicatorColor: Colors.primary["500"],
-  textDayFontFamily: "overpass-black",
-  textMonthFontFamily: "overpass-black",
-  textDayHeaderFontFamily: "overpass-black"
+  agendaDayTextColor: Colors.primary["500"],
+  agendaDayNumColor: Colors.primary["500"],
+  agendaTodayColor: Colors.primary["500"],
+  agendaKnobColor: Colors.primary["200"],
+  textDayFontFamily: "montserrat-regular",
+  textMonthFontFamily: "montserrat-bold",
+  textDayHeaderFontFamily: "montserrat-bold"
 };
 
 const RequiredText = styled.Text`
@@ -33,7 +36,7 @@ const RequiredText = styled.Text`
 
 const DatePickerTitle = styled.Text`
   color: ${Colors.primary["500"]};
-  font-family: "overpass-black;
+  font-family: "montserrat-extra-bold;
   font-size: 20px;
   margin-bottom: 8px;
   text-align: center;
@@ -160,7 +163,7 @@ export default ({
                   dates.length === 2 ? Colors.primary["500"] : Colors.inactive
               }}
               titleStyle={{
-                fontFamily: "overpass-black"
+                fontFamily: "montserrat-extra-bold"
               }}
               title="Done"
             />
@@ -183,7 +186,7 @@ const styles = StyleSheet.create({
     alignItems: "flex-end"
   },
   buttonTitleStyles: {
-    fontFamily: "overpass-black",
+    fontFamily: "montserrat-extra-bold",
     color: Colors.primary["500"],
     fontSize: 24,
     marginBottom: -4

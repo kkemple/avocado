@@ -23,14 +23,15 @@ const EventCard = styled.View`
 const EventTitle = styled.Text`
   color: ${Colors.text};
   font-size: 20px;
-  font-family: "permanent-marker";
+  font-family: "montserrat-black";
   max-width: 80%;
   line-height: 20px;
+  margin-bottom: 4px;
 `;
 
 const EventDates = styled.Text`
   color: ${Colors.grey["700"]};
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
   font-size: 12px;
 `;
 
@@ -40,12 +41,12 @@ const Summary = styled.TouchableOpacity`
 
 const EventDatesContainer = styled.View`
   flex-direction: row;
-  margin-bottom: 16;
+  margin-bottom: 16px;
 `;
 
 const TimeToEvent = styled.Text`
   color: ${Colors.primary["500"]};
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
   font-size: 12px;
 `;
 

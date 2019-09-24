@@ -31,7 +31,7 @@ const Day = styled.View`
 `;
 
 const Temp = styled.Text`
-  font-family: "overpass-black";
+  font-family: "montserrat-bold";
   color: ${Colors.primary["700"]};
 `;
 

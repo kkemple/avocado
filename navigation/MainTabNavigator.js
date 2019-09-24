@@ -63,7 +63,7 @@ const MapStack = createStackNavigator(
 );
 
 MapStack.navigationOptions = {
-  tabBarLabel: "Map",
+  tabBarLabel: "Events Map",
   tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="map" />
 };
 
@@ -114,7 +114,7 @@ const tabNavigator = createBottomTabNavigator(
         backgroundColor: Colors.tabBar
       },
       labelStyle: {
-        fontWeight: "bold"
+        fontFamily: "montserrat-bold"
       }
     }
   }

@@ -75,12 +75,12 @@ export default ({ autoFocus = false, required, onLocationSelected, value }) => {
             paddingLeft: 0,
             paddingRight: 0,
             color: Colors.primary["500"],
-            fontFamily: "overpass-bold",
+            fontFamily: "montserrat-bold",
             backgroundColor: "transparent",
             fontSize: 24
           },
           description: {
-            fontFamily: "overpass-regular",
+            fontFamily: "montserrat-regular",
             color: Colors.primary["500"],
             marginBottom: -10
           },

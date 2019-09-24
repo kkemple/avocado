@@ -25,11 +25,12 @@ const Task = styled.View`
 `;
 
 const TaskTitle = styled.Text`
-  font-family: "overpass-bold";
+  font-family: "montserrat-bold";
 `;
 
 const TaskDueDate = styled.Text`
-  color: ${Colors.primary["500"]};
+  color: ${Colors.primary["600"]};
+  font-family: "montserrat-regular";
 `;
 
 export default ({ onTasksCreated = () => {} }) => {
@@ -129,7 +130,7 @@ export default ({ onTasksCreated = () => {} }) => {
               value={newTask.title}
               inputStyle={{
                 color: Colors.primary["500"],
-                fontFamily: "overpass-black",
+                fontFamily: "montserrat-extra-bold",
                 fontSize: 24
               }}
               inputContainerStyle={{
@@ -140,7 +141,7 @@ export default ({ onTasksCreated = () => {} }) => {
               style={{
                 marginTop: 32,
                 textAlign: "center",
-                fontFamily: "overpass-black",
+                fontFamily: "montserrat-extra-bold",
                 color: Colors.inactive,
                 fontSize: 18
               }}
@@ -161,15 +162,18 @@ export default ({ onTasksCreated = () => {} }) => {
                 selectedDayTextColor: Colors.grey["0"],
                 todayTextColor: Colors.primary["500"],
                 dayTextColor: Colors.text,
-                textDisabledColor: Colors.inactive,
+                textDisabledColor: Colors.primary["200"],
                 dotColor: Colors.primary["500"],
                 selectedDotColor: Colors.grey["0"],
-                arrowColor: Colors.primary["500"],
                 monthTextColor: Colors.text,
                 indicatorColor: Colors.primary["500"],
-                textDayFontFamily: "overpass-black",
-                textMonthFontFamily: "overpass-black",
-                textDayHeaderFontFamily: "overpass-black"
+                agendaDayTextColor: Colors.primary["500"],
+                agendaDayNumColor: Colors.primary["500"],
+                agendaTodayColor: Colors.primary["500"],
+                agendaKnobColor: Colors.primary["200"],
+                textDayFontFamily: "montserrat-regular",
+                textMonthFontFamily: "montserrat-bold",
+                textDayHeaderFontFamily: "montserrat-bold"
               }}
             />
             <Button
@@ -192,7 +196,7 @@ export default ({ onTasksCreated = () => {} }) => {
                 backgroundColor: Colors.primary["500"]
               }}
               titleStyle={{
-                fontFamily: "overpass-black"
+                fontFamily: "montserrat-extra-bold"
               }}
               title="Done"
             />

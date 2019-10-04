@@ -49,7 +49,7 @@ export const getEvent = `query GetEvent($id: ID!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -109,7 +109,7 @@ export const listEvents = `query ListEvents(
       }
       nextToken
     }
-      contacts
+      notes
       createdAt
       updatedAt
       owner
@@ -170,7 +170,7 @@ export const getTask = `query GetTask($id: ID!) {
       }
       nextToken
     }
-      contacts
+      notes
       createdAt
       updatedAt
       owner
@@ -199,7 +199,7 @@ export const listTasks = `query ListTasks(
         twitter
         website
         tickets
-        contacts
+        notes
         createdAt
         updatedAt
         owner

@@ -49,7 +49,7 @@ export const onCreateEvent = `subscription OnCreateEvent($owner: String!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -104,7 +104,7 @@ export const onUpdateEvent = `subscription OnUpdateEvent($owner: String!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -159,7 +159,7 @@ export const onDeleteEvent = `subscription OnDeleteEvent($owner: String!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -201,7 +201,7 @@ export const onCreateTask = `subscription OnCreateTask($owner: String!) {
       tasks {
         nextToken
       }
-      contacts
+      notes
       createdAt
       updatedAt
       owner
@@ -248,7 +248,7 @@ export const onUpdateTask = `subscription OnUpdateTask($owner: String!) {
       tasks {
         nextToken
       }
-      contacts
+      notes
       createdAt
       updatedAt
       owner
@@ -295,7 +295,7 @@ export const onDeleteTask = `subscription OnDeleteTask($owner: String!) {
       tasks {
         nextToken
       }
-      contacts
+      notes
       createdAt
       updatedAt
       owner

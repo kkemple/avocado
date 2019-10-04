@@ -1,11 +1,9 @@
 import React, { createRef, useRef, useState, useEffect } from "react";
 import {
   TouchableOpacity,
-  Image,
   View,
   Animated,
   Dimensions,
-  ScrollView,
   StatusBar
 } from "react-native";
 import { API, graphqlOperation } from "aws-amplify";
@@ -20,7 +18,6 @@ import Loader from "../components/Loader";
 import Colors from "../constants/Colors";
 import { listEvents } from "../graphql/queries";
 import markerImage from "../assets/images/map-marker-reverse.png";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 const getDisplayDates = (start, end) => {
   if (start === end) {
@@ -111,11 +108,11 @@ export default function EventsMapScreen({ navigation }) {
 
   const updateCamera = async (event, animate) => {
     const camera = await mapView.current.getCamera();
+
     camera.center.latitude = event.venue.location.lat;
     camera.center.longitude = event.venue.location.lng;
     camera.pitch = 45;
     camera.heading = 0;
-    camera.altitude = 10000;
     camera.zoom = 3;
 
     if (animate) {
@@ -205,11 +202,17 @@ export default function EventsMapScreen({ navigation }) {
   return !loaded ? (
     <Loader />
   ) : (
-    <View style={{ flex: 1, overflow: "hidden" }}>
-      {!!sortedEvents.length && (
-        <React.Fragment>
-          <StatusBar barStyle="light-content" />
+    <View
+      style={{
+        flex: 1,
+        overflow: "hidden"
+      }}
+    >
+      <React.Fragment>
+        <StatusBar barStyle="light-content" />
+        {!!sortedEvents.length && (
           <MapView
+            style={{ backgroundColor: Colors.primary["900"] }}
             provider="google"
             customMapStyle={require("../map-theme")}
             style={{ flex: 1 }}
@@ -281,81 +284,81 @@ export default function EventsMapScreen({ navigation }) {
               );
             })}
           </MapView>
-          <Animated.ScrollView
-            ref={scrollView}
-            horizontal
-            scrollEventThrottle={16}
-            showsHorizontalScrollIndicator={false}
-            snapToInterval={CARD_WIDTH}
-            decelerationRate="fast"
-            onScroll={Animated.event(
-              [
-                {
-                  nativeEvent: {
-                    contentOffset: {
-                      x: animation
-                    }
+        )}
+        <Animated.ScrollView
+          ref={scrollView}
+          horizontal
+          scrollEventThrottle={16}
+          showsHorizontalScrollIndicator={false}
+          snapToInterval={CARD_WIDTH}
+          decelerationRate="fast"
+          onScroll={Animated.event(
+            [
+              {
+                nativeEvent: {
+                  contentOffset: {
+                    x: animation
                   }
                 }
-              ],
-              { useNativeDriver: true }
-            )}
-            style={{
-              position: "absolute",
-              bottom: 30,
-              paddingVertical: 10,
-              width: CARD_WIDTH,
-              paddingLeft: 32,
-              overflow: "visible"
-            }}
-            contentContainerStyle={{
-              alignItems: "stretch"
-            }}
-          >
-            {sortedEvents.map((event, eventIndex) => {
-              const animationStyles = {
-                opacity: animation.interpolate({
-                  inputRange: [
-                    (eventIndex - 1) * CARD_WIDTH,
-                    eventIndex * CARD_WIDTH,
-                    (eventIndex + 1) * CARD_WIDTH
-                  ],
-                  outputRange: [0.8, 1, 0.8],
-                  extrapolate: "clamp"
-                }),
-                transform: [
-                  {
-                    scale: animation.interpolate({
-                      inputRange: [
-                        (eventIndex - 1) * CARD_WIDTH,
-                        eventIndex * CARD_WIDTH,
-                        (eventIndex + 1) * CARD_WIDTH
-                      ],
-                      outputRange: [1, 1.1, 1],
-                      extrapolate: "clamp"
-                    })
-                  }
-                ]
-              };
+              }
+            ],
+            { useNativeDriver: true }
+          )}
+          style={{
+            position: "absolute",
+            bottom: 30,
+            paddingVertical: 10,
+            width: CARD_WIDTH,
+            paddingLeft: 32,
+            overflow: "visible"
+          }}
+          contentContainerStyle={{
+            alignItems: "stretch"
+          }}
+        >
+          {sortedEvents.map((event, eventIndex) => {
+            const animationStyles = {
+              opacity: animation.interpolate({
+                inputRange: [
+                  (eventIndex - 1) * CARD_WIDTH,
+                  eventIndex * CARD_WIDTH,
+                  (eventIndex + 1) * CARD_WIDTH
+                ],
+                outputRange: [0.8, 1, 0.8],
+                extrapolate: "clamp"
+              }),
+              transform: [
+                {
+                  scale: animation.interpolate({
+                    inputRange: [
+                      (eventIndex - 1) * CARD_WIDTH,
+                      eventIndex * CARD_WIDTH,
+                      (eventIndex + 1) * CARD_WIDTH
+                    ],
+                    outputRange: [1, 1.1, 1],
+                    extrapolate: "clamp"
+                  })
+                }
+              ]
+            };
 
-              return (
-                <Item
-                  style={animationStyles}
-                  key={event.id}
-                  event={event}
-                  width={CARD_WIDTH}
-                  onPress={() => {
-                    navigation.navigate("EventDetail", {
-                      eventId: event.id,
-                      title: event.title
-                    });
-                  }}
-                />
-              );
-            })}
-          </Animated.ScrollView>
-        </React.Fragment>
-      )}
+            return (
+              <Item
+                style={animationStyles}
+                key={event.id}
+                event={event}
+                width={CARD_WIDTH}
+                onPress={() => {
+                  navigation.navigate("EventDetail", {
+                    eventId: event.id,
+                    title: event.title
+                  });
+                }}
+              />
+            );
+          })}
+        </Animated.ScrollView>
+      </React.Fragment>
     </View>
   );
 }

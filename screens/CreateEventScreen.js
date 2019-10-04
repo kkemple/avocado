@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Alert, StyleSheet } from "react-native";
+import { View, Alert, StyleSheet, KeyboardAvoidingView } from "react-native";
 import styled from "@emotion/native";
 import { Button, Input } from "react-native-elements";
 import { TabView } from "react-native-tab-view";
@@ -10,11 +10,10 @@ import { API, graphqlOperation } from "aws-amplify";
 import { SafeAreaView } from "react-navigation";
 
 import Tasks from "../components/TasksInput";
-import ContactsPicker from "../components/Contacts";
+import NotesPicker from "../components/Notes";
 import DatesPicker from "../components/DatesPicker";
 import LocationPicker from "../components/LocationPicker";
 import Colors from "../constants/Colors";
-import useKeyboardVisible from "../hooks/keyboard-visible";
 import { createEvent, createTask } from "../graphql/mutations";
 
 const stepIsValid = async (key, value) => {
@@ -96,15 +95,8 @@ const errors = {
   tickets: "Must be a URL"
 };
 
-const Title = styled.Text`
-  font-family: "montserrat-extra-bold";
-  font-size: 28px;
-  color: ${Colors.text};
-`;
-
 const WizardView = styled.View`
   flex: 1;
-  justify-content: center;
   align-items: stretch;
 `;
 
@@ -126,15 +118,10 @@ const Actions = styled.View`
   justify-content: flex-end;
 `;
 
-const ContactsInput = ({ onContactsSelected, value }) => (
+const NotesInput = ({ onChange, value }) => (
   <WizardView>
-    <WizardViewQuestion>Would you like to add any contacts?</WizardViewQuestion>
-    <ContactsPicker
-      size="medium"
-      showControls
-      onContactsSelected={onContactsSelected}
-      contacts={value}
-    />
+    <WizardViewQuestion>Any notes?</WizardViewQuestion>
+    <NotesPicker onNotesAdded={onChange} notes={value} />
   </WizardView>
 );
 
@@ -142,6 +129,9 @@ const TitleInput = ({ onChange, value }) => (
   <WizardView>
     <WizardViewQuestion>What event are you attending?</WizardViewQuestion>
     <Input
+      returnKeyType="done"
+      autoCompleteType="off"
+      autoCapitalize="words"
       value={value}
       onChangeText={onChange}
       errorMessage="Required"
@@ -160,7 +150,7 @@ const TitleInput = ({ onChange, value }) => (
 
 const DatesInput = ({ onDatesSelected }) => (
   <WizardView>
-    <WizardViewQuestion style={{ paddingTop: 56, marginBottom: 0 }}>
+    <WizardViewQuestion style={{ marginBottom: 0 }}>
       When is the event?
     </WizardViewQuestion>
     <DatesPicker
@@ -172,7 +162,7 @@ const DatesInput = ({ onDatesSelected }) => (
 
 const VenueInput = ({ onLocationSelected, value }) => (
   <WizardView>
-    <WizardViewQuestion>Where is the event taking place?</WizardViewQuestion>
+    <WizardViewQuestion>Where is the event?</WizardViewQuestion>
     <LocationPicker
       required
       onLocationSelected={onLocationSelected}
@@ -183,7 +173,7 @@ const VenueInput = ({ onLocationSelected, value }) => (
 
 const HotelInput = ({ onLocationSelected, value }) => (
   <WizardView>
-    <WizardViewQuestion>Where will you be staying?</WizardViewQuestion>
+    <WizardViewQuestion>Where are you staying?</WizardViewQuestion>
     <LocationPicker onLocationSelected={onLocationSelected} value={value} />
   </WizardView>
 );
@@ -197,8 +187,9 @@ const TasksInput = ({ onTasksCreated }) => (
 
 const WebsiteInput = ({ onChange, value }) => (
   <WizardView>
-    <WizardViewQuestion>Does the event have a website?</WizardViewQuestion>
+    <WizardViewQuestion>Event website?</WizardViewQuestion>
     <Input
+      autoCapitalize="none"
       onChangeText={onChange}
       value={value}
       containerStyle={{ marginBottom: 26 }}
@@ -216,10 +207,9 @@ const WebsiteInput = ({ onChange, value }) => (
 
 const TwitterInput = ({ onChange, value }) => (
   <WizardView>
-    <WizardViewQuestion>
-      Is there a Twitter handle for the event?
-    </WizardViewQuestion>
+    <WizardViewQuestion>Twitter handle for event?</WizardViewQuestion>
     <Input
+      autoCapitalize="none"
       onChangeText={onChange}
       value={value}
       containerStyle={{ marginBottom: 26 }}
@@ -237,8 +227,9 @@ const TwitterInput = ({ onChange, value }) => (
 
 const TicketsInput = ({ onChange, value }) => (
   <WizardView>
-    <WizardViewQuestion>What is the URL for your tickets?</WizardViewQuestion>
+    <WizardViewQuestion>URL for your tickets?</WizardViewQuestion>
     <Input
+      autoCapitalize="none"
       onChangeText={onChange}
       value={value}
       containerStyle={{ marginBottom: 26 }}
@@ -265,7 +256,7 @@ export default function CreateEventScreen({ navigation }) {
     venue: null,
     hotel: null,
     tasks: [],
-    contacts: []
+    notes: null
   };
   const [navigationState, setNavigationState] = useState({
     index: 0,
@@ -274,15 +265,14 @@ export default function CreateEventScreen({ navigation }) {
       { key: "dates" },
       { key: "venue" },
       { key: "hotel" },
-      { key: "contacts" },
-      { key: "tasks" },
       { key: "twitter" },
       { key: "website" },
+      { key: "notes" },
+      { key: "tasks" },
       { key: "tickets" }
     ]
   });
   const [eventData, setEventData] = useState(defaults);
-  const [keyboardVisible] = useKeyboardVisible();
 
   const onDoneButtonPressed = async () => {
     if (navigationState.index + 1 === navigationState.routes.length) {
@@ -351,125 +341,125 @@ export default function CreateEventScreen({ navigation }) {
   };
 
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <View style={{ flex: 1, padding: 24 }}>
-        <Header>
-          <Button
-            activeOpacity={0.6}
-            onPress={() => navigation.goBack()}
-            containerStyle={styles.cancelButtonStyles}
-            titleStyle={styles.cancelButtonTitleStyles}
-            type="clear"
-            title="Cancel"
-          />
-          <Title>Create Event</Title>
-        </Header>
-        <View style={{ flex: 1 }}>
-          <TabView
-            swipeEnabled={false}
-            renderTabBar={() => null}
-            navigationState={navigationState}
-            onIndexChange={index =>
-              setNavigationState(state => ({ ...state, index }))
-            }
-            initialLayout={{ flex: 1 }}
-            renderScene={({ route }) => {
-              switch (route.key) {
-                case "tasks":
-                  return (
-                    <TasksInput
-                      onTasksCreated={tasks => {
-                        setEventData(event => ({ ...event, tasks }));
-                      }}
-                    />
-                  );
-                case "contacts":
-                  return (
-                    <ContactsInput
-                      onContactsSelected={contacts => {
-                        setEventData(event => ({ ...event, contacts }));
-                      }}
-                      value={eventData.contacts}
-                    />
-                  );
-                case "title":
-                  return (
-                    <TitleInput
-                      onChange={text => {
-                        setEventData(event => ({ ...event, title: text }));
-                      }}
-                      value={eventData.title}
-                    />
-                  );
-                case "dates":
-                  return (
-                    <DatesInput
-                      onDatesSelected={values => {
-                        setEventData(event => ({ ...event, dates: values }));
-                      }}
-                    />
-                  );
-                case "venue":
-                  return (
-                    <VenueInput
-                      value={eventData.venue ? eventData.venue.address : ""}
-                      onLocationSelected={values => {
-                        if (!values.address) {
-                          Alert.alert(
-                            "Venue seems to have no direct address, please choose another."
-                          );
-                          return;
-                        }
-
-                        setEventData(event => ({ ...event, venue: values }));
-                      }}
-                    />
-                  );
-                case "hotel":
-                  return (
-                    <HotelInput
-                      value={eventData.hotel ? eventData.hotel.address : ""}
-                      onLocationSelected={values => {
-                        setEventData(event => ({ ...event, hotel: values }));
-                      }}
-                    />
-                  );
-                case "website":
-                  return (
-                    <WebsiteInput
-                      onChange={text => {
-                        setEventData(event => ({
-                          ...event,
-                          website: text.toLowerCase()
-                        }));
-                      }}
-                      value={eventData.website}
-                    />
-                  );
-                case "twitter":
-                  return (
-                    <TwitterInput
-                      onChange={text => {
-                        setEventData(event => ({ ...event, twitter: text }));
-                      }}
-                      value={eventData.twitter}
-                    />
-                  );
-                case "tickets":
-                  return (
-                    <TicketsInput
-                      onChange={text => {
-                        setEventData(event => ({ ...event, tickets: text }));
-                      }}
-                      value={eventData.tickets}
-                    />
-                  );
-                default:
-                  return null;
+    <KeyboardAvoidingView style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={[{ flex: 1, padding: 24, justifyContent: "flex-end" }]}>
+          <Header>
+            <Button
+              activeOpacity={0.6}
+              onPress={() => navigation.goBack()}
+              containerStyle={styles.cancelButtonStyles}
+              titleStyle={styles.cancelButtonTitleStyles}
+              type="clear"
+              title="Cancel"
+            />
+          </Header>
+          <View style={{ marginTop: 32, flex: 1 }}>
+            <TabView
+              swipeEnabled={false}
+              renderTabBar={() => null}
+              navigationState={navigationState}
+              onIndexChange={index =>
+                setNavigationState(state => ({ ...state, index }))
               }
-            }}
-          />
+              initialLayout={{ flex: 1 }}
+              renderScene={({ route }) => {
+                switch (route.key) {
+                  case "tasks":
+                    return (
+                      <TasksInput
+                        onTasksCreated={tasks => {
+                          setEventData(event => ({ ...event, tasks }));
+                        }}
+                      />
+                    );
+                  case "notes":
+                    return (
+                      <NotesInput
+                        onNoteAdded={notes => {
+                          setEventData(event => ({ ...event, notes }));
+                        }}
+                        value={eventData.notes}
+                      />
+                    );
+                  case "title":
+                    return (
+                      <TitleInput
+                        onChange={text => {
+                          setEventData(event => ({ ...event, title: text }));
+                        }}
+                        value={eventData.title}
+                      />
+                    );
+                  case "dates":
+                    return (
+                      <DatesInput
+                        onDatesSelected={values => {
+                          setEventData(event => ({ ...event, dates: values }));
+                        }}
+                      />
+                    );
+                  case "venue":
+                    return (
+                      <VenueInput
+                        value={eventData.venue ? eventData.venue.address : ""}
+                        onLocationSelected={values => {
+                          if (!values.address) {
+                            Alert.alert(
+                              "Venue seems to have no direct address, please choose another."
+                            );
+                            return;
+                          }
 
+                          setEventData(event => ({ ...event, venue: values }));
+                        }}
+                      />
+                    );
+                  case "hotel":
+                    return (
+                      <HotelInput
+                        value={eventData.hotel ? eventData.hotel.address : ""}
+                        onLocationSelected={values => {
+                          setEventData(event => ({ ...event, hotel: values }));
+                        }}
+                      />
+                    );
+                  case "website":
+                    return (
+                      <WebsiteInput
+                        onChange={text => {
+                          setEventData(event => ({
+                            ...event,
+                            website: text.toLowerCase()
+                          }));
+                        }}
+                        value={eventData.website}
+                      />
+                    );
+                  case "twitter":
+                    return (
+                      <TwitterInput
+                        onChange={text => {
+                          setEventData(event => ({ ...event, twitter: text }));
+                        }}
+                        value={eventData.twitter}
+                      />
+                    );
+                  case "tickets":
+                    return (
+                      <TicketsInput
+                        onChange={text => {
+                          setEventData(event => ({ ...event, tickets: text }));
+                        }}
+                        value={eventData.tickets}
+                      />
+                    );
+                  default:
+                    return null;
+                }
+              }}
+            />
+          </View>
           <Actions>
             {navigationState.index !== 0 && (
               <Button
@@ -519,10 +509,9 @@ export default function CreateEventScreen({ navigation }) {
               ]}
             />
           </Actions>
-          {keyboardVisible && <View style={{ flex: 1 }} />}
         </View>
-      </View>
-    </SafeAreaView>
+      </SafeAreaView>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -540,7 +529,6 @@ const styles = StyleSheet.create({
     color: Colors.inactive
   },
   cancelButtonStyles: {
-    marginTop: 6,
     marginLeft: -10
   },
   doneButtonStyles: {

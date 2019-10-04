@@ -21,7 +21,7 @@ const Task = styled.View`
 `;
 
 const TaskTitle = styled.Text`
-  font-family: "montserrat-bold";
+  font-family: "montserrat-medium";
 `;
 
 const TaskDueDate = styled.Text`

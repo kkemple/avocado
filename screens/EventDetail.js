@@ -9,7 +9,8 @@ import {
   Text,
   TouchableOpacity,
   View,
-  KeyboardAvoidingView
+  KeyboardAvoidingView,
+  StatusBar
 } from "react-native";
 import styled from "@emotion/native";
 import { Button, Icon, Input } from "react-native-elements";
@@ -18,11 +19,10 @@ import { SafeAreaView } from "react-navigation";
 import MapView, { Marker } from "react-native-maps";
 import { Feather } from "@expo/vector-icons";
 import { Calendar } from "react-native-calendars";
-import Color from "color";
 
 import ActionBar from "../components/ActionBar";
 import Colors from "../constants/Colors";
-import Contacts from "../components/Contacts";
+import Notes from "../components/Notes";
 import DatesPicker from "../components/DatesPicker";
 import LocationPicker from "../components/LocationPicker";
 import Tasks from "../components/Tasks";
@@ -78,6 +78,7 @@ const ChangeLocationButton = styled.TouchableOpacity`
   justify-content: center;
   margin: 8px;
   width: 52px;
+  elevation: 2;
 `;
 
 const CancelButton = styled.TouchableOpacity`
@@ -96,8 +97,8 @@ const WeatherContainer = styled.View`
   padding-horizontal: -16px;
 `;
 
-const ContactsContainer = styled.View`
-  padding-horizontal: 8px;
+const NotesContainer = styled.View`
+  padding-horizontal: 16px;
 `;
 
 const ActionBarContainer = styled.View`
@@ -120,6 +121,7 @@ const EditActionsButton = styled.TouchableOpacity`
   margin: 8px;
   margin-left: 16px;
   width: 36px;
+  elevation: 2;
 `;
 
 const LocationTitleContainer = styled.View`
@@ -185,6 +187,7 @@ const Location = ({ location, title, onPress }) => {
 
   return (
     <View>
+      <StatusBar barStyle="dark-content" />
       {location ? (
         <StyledMapView
           ref={mapView}
@@ -251,13 +254,7 @@ const Location = ({ location, title, onPress }) => {
   );
 };
 
-const TitleInput = ({
-  showModal,
-  value,
-  onChange,
-  onCancel,
-  keyboardVisible
-}) => {
+const TitleInput = ({ showModal, value, onChange, onCancel }) => {
   const [title, setTitle] = useState(value);
 
   return (
@@ -268,9 +265,7 @@ const TitleInput = ({
             style={{
               flex: 1,
               padding: 24,
-              justifyContent: keyboardVisible ? "flex-end" : "center",
-              alignItems: "stretch",
-              height: "100%"
+              alignItems: "stretch"
             }}
           >
             <Input
@@ -316,7 +311,6 @@ const TitleInput = ({
               />
             </InputActionsContainer>
           </View>
-          {keyboardVisible && <View style={{ flex: 1 }} />}
         </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>
@@ -328,8 +322,7 @@ const LocationInput = ({
   value,
   onChange,
   onCancel,
-  required = false,
-  keyboardVisible
+  required = false
 }) => {
   const [location, setLocation] = useState(value);
   return (
@@ -340,7 +333,6 @@ const LocationInput = ({
             style={{
               flex: 1,
               padding: 24,
-              justifyContent: keyboardVisible ? "flex-end" : "center",
               alignItems: "stretch",
               height: "100%"
             }}
@@ -388,7 +380,6 @@ const LocationInput = ({
               />
             </InputActionsContainer>
           </View>
-          {keyboardVisible && <View style={{ flex: 1 }} />}
         </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>
@@ -414,7 +405,6 @@ const ActionsInput = ({
             style={{
               flex: 1,
               padding: 24,
-              justifyContent: keyboardVisible ? "flex-end" : "center",
               alignItems: "stretch",
               height: "100%"
             }}
@@ -435,7 +425,6 @@ const ActionsInput = ({
               errorStyle={styles.inputErrorStyle}
               inputContainerStyle={styles.inputContainerContainerStyle}
               inputStyle={styles.inputStyle}
-              containerStyle={{ marginTop: 48 }}
             />
             <Input
               value={tickets}
@@ -444,7 +433,6 @@ const ActionsInput = ({
               errorStyle={styles.inputErrorStyle}
               inputContainerStyle={styles.inputContainerContainerStyle}
               inputStyle={styles.inputStyle}
-              containerStyle={{ marginTop: 48 }}
             />
             <InputActionsContainer>
               <Button
@@ -482,7 +470,6 @@ const ActionsInput = ({
               />
             </InputActionsContainer>
           </View>
-          {keyboardVisible && <View style={{ flex: 1 }} />}
         </SafeAreaView>
       </KeyboardAvoidingView>
     </Modal>
@@ -500,7 +487,6 @@ const TasksForm = ({ showModal, onTaskCreated, onCancel, keyboardVisible }) => {
             style={{
               flex: 1,
               padding: 24,
-              justifyContent: keyboardVisible ? "flex-end" : "center",
               paddingTop: keyboardVisible ? 56 : 24
             }}
           >
@@ -732,17 +718,12 @@ export default function EventDetailScreen({ navigation }) {
         >
           {event && (
             <View>
-              <ContactsContainer>
-                <Contacts
-                  showControls={true}
-                  contacts={event.contacts}
-                  onContactsSelected={contacts => {
-                    setTouchedData({
-                      contacts
-                    });
-                  }}
+              <NotesContainer>
+                <Notes
+                  notes={event.notes}
+                  onNotesAdded={notes => setTouchedData({ notes })}
                 />
-              </ContactsContainer>
+              </NotesContainer>
               <View
                 style={event.hotel ? { marginBottom: 8, flex: 1 } : { flex: 1 }}
               >
@@ -858,7 +839,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.primary["500"]
   },
   inputContainerStyle: {
-    marginTop: "auto"
+    marginTop: 16
   },
   inputStyle: {
     fontSize: 24,

@@ -49,7 +49,7 @@ export const createEvent = `mutation CreateEvent($input: CreateEventInput!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -104,7 +104,7 @@ export const updateEvent = `mutation UpdateEvent($input: UpdateEventInput!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -159,7 +159,7 @@ export const deleteEvent = `mutation DeleteEvent($input: DeleteEventInput!) {
       }
       nextToken
     }
-    contacts
+    notes
     createdAt
     updatedAt
     owner
@@ -201,7 +201,7 @@ export const createTask = `mutation CreateTask($input: CreateTaskInput!) {
       tasks {
         nextToken
       }
-      contacts
+      notes
       createdAt
       updatedAt
       owner
@@ -248,7 +248,7 @@ export const updateTask = `mutation UpdateTask($input: UpdateTaskInput!) {
       tasks {
         nextToken
       }
-      contacts
+      notes
       createdAt
       updatedAt
       owner
@@ -295,7 +295,7 @@ export const deleteTask = `mutation DeleteTask($input: DeleteTaskInput!) {
       tasks {
         nextToken
       }
-      contacts
+      notes
       createdAt
       updatedAt
       owner

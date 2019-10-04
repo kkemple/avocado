@@ -4,7 +4,8 @@ import {
   StyleSheet,
   View,
   Text,
-  RefreshControl
+  RefreshControl,
+  StatusBar
 } from "react-native";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import getTime from "date-fns/getTime";
@@ -181,6 +182,7 @@ export default function HomeScreen({ navigation }) {
         }
       ]}
     >
+      <StatusBar barStyle="dark-content" />
       <View style={styles.container}>
         {!sortedEvents.length && !loaded && <Loader />}
         {!sortedEvents.length && loaded && (

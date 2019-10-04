@@ -32,7 +32,7 @@ const HomeStack = createStackNavigator(
 HomeStack.navigationOptions = {
   tabBarLabel: "Upcoming",
   tabBarIcon: ({ focused }) => (
-    <TabBarIcon focused={focused} name="access-time" />
+    <TabBarIcon focused={focused} name="calendar-clock" />
   )
 };
 
@@ -49,7 +49,7 @@ const EventsStack = createStackNavigator(
 
 EventsStack.navigationOptions = {
   tabBarLabel: "Events",
-  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="event" />
+  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="calendar" />
 };
 
 EventsStack.path = "";
@@ -63,8 +63,10 @@ const MapStack = createStackNavigator(
 );
 
 MapStack.navigationOptions = {
-  tabBarLabel: "Events Map",
-  tabBarIcon: ({ focused }) => <TabBarIcon focused={focused} name="map" />
+  tabBarLabel: "Locations",
+  tabBarIcon: ({ focused }) => (
+    <TabBarIcon focused={focused} name="map-marker-multiple" />
+  )
 };
 
 MapStack.path = "";
@@ -108,6 +110,7 @@ const tabNavigator = createBottomTabNavigator(
   {
     initialRouteName: "HomeStack",
     tabBarOptions: {
+      keyboardHidesTabBar: true,
       activeTintColor: Colors.tabIconSelected,
       inactiveTintColor: Colors.tabIconDefault,
       style: {

@@ -25,7 +25,7 @@ const Task = styled.View`
 `;
 
 const TaskTitle = styled.Text`
-  font-family: "montserrat-bold";
+  font-family: "montserrat-medium";
 `;
 
 const TaskDueDate = styled.Text`
@@ -64,6 +64,7 @@ export default ({ onTasksCreated = () => {} }) => {
     margin-bottom: 16px;
     margin: 8px;
     width: 52px;
+    elevation: 2;
   `;
 
   return (
@@ -105,10 +106,10 @@ export default ({ onTasksCreated = () => {} }) => {
         })}
       </View>
       <Modal animationType="slide" visible={showPicker}>
-        <SafeAreaView>
+        <SafeAreaView style={{flex: 1}}>
           <View
             style={{
-              height: "100%",
+              flex: 1,
               padding: 24
             }}
           >

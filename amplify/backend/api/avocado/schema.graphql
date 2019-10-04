@@ -10,7 +10,7 @@ type Event @model @auth(rules: [{ allow: owner }]) {
   website: String
   tickets: String
   tasks: [Task] @connection(name: "EventTasks", sortField: "createdAt")
-  contacts: [String]
+  notes: String
   createdAt: String
   updatedAt: String
 }
@@ -44,7 +44,6 @@ type EventLocation {
   googleMapsUrl: String!
   location: LocationLatLng!
   name: String
-  nearby: [Location] @function(name: "AvocadoLocationNearbyPlaces-${env}")
 }
 
 type LocationLatLng {

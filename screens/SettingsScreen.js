@@ -1,5 +1,5 @@
 import React from "react";
-import { Linking, TouchableOpacity, Text, View } from "react-native";
+import { Linking, TouchableOpacity, StatusBar, View } from "react-native";
 import { Button } from "react-native-elements";
 import { SafeAreaView } from "react-navigation";
 import { Auth } from "aws-amplify";
@@ -28,6 +28,7 @@ const AttributionLink = styled.Text`
 export default function Settings() {
   return (
     <SafeAreaView style={{ flex: 1 }}>
+      <StatusBar barStyle="dark-content" />
       <View style={{ flex: 1, padding: 24 }}>
         <Attribution>
           <AttributionText>Built with </AttributionText>

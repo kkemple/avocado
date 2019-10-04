@@ -1,8 +1,8 @@
 import React, { useCallback, useState, useEffect } from "react";
-import { View, TouchableOpacity } from "react-native";
+import { View, TouchableOpacity, StatusBar } from "react-native";
 import { Agenda } from "react-native-calendars";
 import styled from "@emotion/native";
-import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
+import { FontAwesome5 } from "@expo/vector-icons";
 import { Auth, API, graphqlOperation } from "aws-amplify";
 import eachDayOfInterval from "date-fns/eachDayOfInterval";
 import parse from "date-fns/parse";
@@ -36,6 +36,7 @@ const AddEventButton = styled.TouchableOpacity`
   justify-content: center;
   align-items: center;
   box-shadow: 1px 1px 1px ${Colors.shadow};
+  elevation: 2;
 `;
 
 const EventTitle = styled.Text`
@@ -94,7 +95,7 @@ const Item = ({ item, onPress, isFirstItem }) => (
     style={{
       flex: 1,
       marginRight: 24,
-      marginTop: isFirstItem ? 28 : 20
+      marginTop: isFirstItem ? 28 : 8
     }}
   >
     <TouchableOpacity activeOpacity={0.6} onPress={onPress}>
@@ -137,6 +138,7 @@ export default function EventsScreen({ navigation }) {
   const [activeMonth, setActiveMonth] = useState(null);
   const [selectedDate, setSelectedDate] = useState(null);
   const [agendaDisplayDate, setAgendaDisplayDate] = useState(null);
+  const [loaded, setLoaded] = useState(false);
 
   const renderItemCall = useCallback((item, isFirstItem) =>
     renderItem(item, isFirstItem, navigation)
@@ -274,6 +276,14 @@ export default function EventsScreen({ navigation }) {
           ...markedDays,
           ...marked
         });
+
+        if (!loaded) {
+          setLoaded(true);
+        }
+
+        if (!selectedDate) {
+          setSelectedDate(format(new Date(), "yyyy-MM-dd"));
+        }
       } catch (error) {
         console.log(error.message);
       }
@@ -498,8 +508,9 @@ export default function EventsScreen({ navigation }) {
         flex: 1
       }}
     >
+      <StatusBar barStyle="dark-content" />
       <View style={{ flex: 1 }}>
-        {!selectedDate && <Loader />}
+        {!loaded && <Loader />}
         {selectedDate && (
           <View style={{ flex: 1 }}>
             <AgendaCurrentDateContainer>

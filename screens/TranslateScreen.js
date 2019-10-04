@@ -5,15 +5,20 @@ import {
   KeyboardAvoidingView,
   Modal,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  StatusBar
 } from "react-native";
-import { Input, Icon, ListItem } from "react-native-elements";
+import { Input, ListItem, Icon } from "react-native-elements";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 import { Predictions } from "aws-amplify";
 import { SafeAreaView } from "react-navigation";
+import { Audio } from "expo-av";
+import * as FileSystem from "expo-file-system";
+import { Buffer } from "buffer";
+import uuid from "uuid/v4";
 import styled from "@emotion/native";
 
 import Colors from "../constants/Colors";
-import useKeyboardVisible from "../hooks/keyboard-visible";
 
 const options = {
   en: {
@@ -86,6 +91,22 @@ const options = {
   }
 };
 
+const suggestions = [
+  "Does this go to ",
+  "Do you speak ",
+  "Where is the bathroom?",
+  "Check, please!",
+  "Do you take credit cards?",
+  "Is tip included?",
+  "Please",
+  "Thank you",
+  "Excuse me",
+  "Call the ambulance",
+  "I am hurt",
+  "I need a hospital",
+  "Call the police"
+];
+
 const ListenButton = styled.TouchableOpacity`
   align-items: center;
   background-color: ${Colors.grey["0"]};
@@ -98,50 +119,43 @@ const ListenButton = styled.TouchableOpacity`
   position: absolute;
   right: 16px;
   width: 64px;
+  elevation: 2;
 `;
 
 const Container = styled.View`
   flex: 1;
   padding: 24px;
-  justify-content: ${props =>
-    props.keyboardVisible ? "flex-end" : "space-around"};
+  justify-content: flex-start;
 `;
 
 const LanguageOptions = styled.View`
-  justify-content: space-between;
+  justify-content: flex-start;
   align-items: center;
   flex-direction: row;
   padding-horizontal: 10px;
 `;
 
-const LanguageOption = styled.TouchableOpacity`
-  flex: 3;
-  border-width: 2px;
-  border-color: ${Colors.primary["500"]};
-  border-radius: 4px;
-  padding: 8px;
-`;
+const LanguageOption = styled.TouchableOpacity``;
 
 const LanguageOptionText = styled.Text`
   text-align: center;
-  font-family: montserrat-extra-bold;
+  font-family: montserrat-bold;
   color: ${Colors.primary["500"]};
 `;
 
 const LanguageContainer = styled.View`
-  justify-content: center;
   padding: 10px;
   flex: 1;
 `;
 
 const TranslatedText = styled.Text`
   color: ${Colors.primary["600"]};
-  font-family: "montserrat-black";
-  font-size: 28px;
+  font-family: "montserrat-extra-bold";
+  font-size: 24px;
 `;
 
 export default function TranslateScreen() {
-  const [keyboardVisible] = useKeyboardVisible();
+  const [showSuggestionsPicker, setShowSuggestionsPicker] = useState(false);
   const [showFromLanguagePicker, setShowFromLanguagePicker] = useState(false);
   const [showToLanguagePicker, setShowToLanguagePicker] = useState(false);
   const [selectedFromLanguage, setSelectedFromLanguage] = useState("en");
@@ -150,6 +164,8 @@ export default function TranslateScreen() {
   const [translatedText, setTranslatedText] = useState("");
 
   const playAudio = async () => {
+    const soundObject = new Audio.Sound();
+
     try {
       const result = await Predictions.convert({
         textToSpeech: {
@@ -161,21 +177,20 @@ export default function TranslateScreen() {
         }
       });
 
-      // const response = await fetch(`${result.speech.url}`, {
-      //   responseType: "arrayBuffer"
-      // });
+      const soundBuffer = Buffer.from(result.audioStream).toString("base64");
+      const id = uuid();
 
-      // const blob = await response.blob();
-      // const localUri = `${FileSystem.cacheDirectory}${uuid()}.mp3`;
+      await FileSystem.writeAsStringAsync(
+        `${FileSystem.documentDirectory}${id}.mp3`,
+        soundBuffer,
+        { encoding: FileSystem.EncodingType.Base64 }
+      );
 
-      // await FileSystem.writeAsStringAsync(localUri, blob);
+      await soundObject.loadAsync({
+        uri: `${FileSystem.documentDirectory}${id}.mp3`
+      });
 
-      // const { sound: soundObject, status } = await Audio.Sound.createAsync(
-      //   { uri: localUri },
-      //   { shouldPlay: true }
-      // );
-
-      console.log({ result });
+      await soundObject.playAsync();
     } catch (error) {
       console.log(error);
     }
@@ -216,9 +231,54 @@ export default function TranslateScreen() {
 
   return (
     <React.Fragment>
+      <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView style={{ flex: 1 }}>
         <SafeAreaView style={{ flex: 1 }}>
-          <Container keyboardVisible={keyboardVisible}>
+          <Container>
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: 16
+              }}
+            >
+              <View>
+                <LanguageOptions>
+                  <LanguageOption
+                    onPress={() => setShowFromLanguagePicker(true)}
+                  >
+                    <LanguageOptionText>
+                      {options[selectedFromLanguage].title}
+                    </LanguageOptionText>
+                  </LanguageOption>
+                  <View style={{ paddingHorizontal: 8 }}>
+                    <MaterialCommunityIcons
+                      style={{ marginBottom: -2 }}
+                      size={16}
+                      name="arrow-right"
+                      color={Colors.primary["500"]}
+                    />
+                  </View>
+                  <LanguageOption onPress={() => setShowToLanguagePicker(true)}>
+                    <LanguageOptionText>
+                      {options[selectedToLanguage].title}
+                    </LanguageOptionText>
+                  </LanguageOption>
+                </LanguageOptions>
+              </View>
+              <View>
+                <LanguageOption onPress={() => setShowSuggestionsPicker(true)}>
+                  <LanguageOptionText>
+                    Suggested{" "}
+                    <MaterialCommunityIcons
+                      name="chevron-down"
+                      color={Colors.primary["500"]}
+                    />
+                  </LanguageOptionText>
+                </LanguageOption>
+              </View>
+            </View>
             <View>
               <Input
                 autoFocus
@@ -232,42 +292,19 @@ export default function TranslateScreen() {
                 inputStyle={styles.inputStyle}
               />
             </View>
-            <View>
-              <LanguageOptions>
-                <LanguageOption onPress={() => setShowFromLanguagePicker(true)}>
-                  <LanguageOptionText>
-                    {options[selectedFromLanguage].title}
-                  </LanguageOptionText>
-                </LanguageOption>
-                <View style={{ flex: 1 }}>
-                  <Icon
-                    size={28}
-                    name="arrow-right"
-                    type="material-community"
-                    color={Colors.primary["500"]}
-                  />
-                </View>
-                <LanguageOption onPress={() => setShowToLanguagePicker(true)}>
-                  <LanguageOptionText>
-                    {options[selectedToLanguage].title}
-                  </LanguageOptionText>
-                </LanguageOption>
-              </LanguageOptions>
-            </View>
-            <View style={{ minHeight: 200 }}>
+            <View style={{ flex: 1 }}>
               <LanguageContainer>
                 <TranslatedText>{translatedText}</TranslatedText>
               </LanguageContainer>
             </View>
-            {keyboardVisible && <View style={{ flex: 1 }} />}
-            {/* <ListenButton onPress={playAudio}>
+            <ListenButton onPress={playAudio}>
               <Icon
                 size={28}
                 name="ear-hearing"
                 type="material-community"
                 color={Colors.primary["500"]}
               />
-            </ListenButton> */}
+            </ListenButton>
           </Container>
         </SafeAreaView>
       </KeyboardAvoidingView>
@@ -287,7 +324,7 @@ export default function TranslateScreen() {
               >
                 <ListItem
                   titleStyle={{
-                    fontFamily: "montserrat-extra-bold",
+                    fontFamily: "montserrat-bold",
                     color: Colors.primary["500"]
                   }}
                   bottomDivider
@@ -314,11 +351,38 @@ export default function TranslateScreen() {
               >
                 <ListItem
                   titleStyle={{
-                    fontFamily: "montserrat-extra-bold",
+                    fontFamily: "montserrat-bold",
                     color: Colors.primary["500"]
                   }}
                   bottomDivider
                   title={options[option].title}
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </SafeAreaView>
+      </Modal>
+      <Modal visible={showSuggestionsPicker} animationType="slide">
+        <SafeAreaView style={{ flex: 1 }}>
+          <ScrollView
+            style={{ flex: 1 }}
+            contentContainerStyle={{ paddingVertical: 24 }}
+          >
+            {suggestions.map(option => (
+              <TouchableOpacity
+                key={option}
+                onPress={() => {
+                  setTextToTranslate(option);
+                  setShowSuggestionsPicker(false);
+                }}
+              >
+                <ListItem
+                  titleStyle={{
+                    fontFamily: "montserrat-bold",
+                    color: Colors.primary["500"]
+                  }}
+                  bottomDivider
+                  title={option}
                 />
               </TouchableOpacity>
             ))}
@@ -335,16 +399,17 @@ TranslateScreen.navigationOptions = {
 
 const styles = StyleSheet.create({
   inputContainerStyle: {
-    padding: 10,
-    borderBottomWidth: 0,
-    justifyContent: "center",
-    minHeight: 200
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.primary["300"],
+    paddingVertical: 8,
+    alignItems: "flex-start"
   },
   inputStyle: {
-    fontSize: 28,
+    fontSize: 24,
     color: Colors.primary["600"],
-    fontFamily: "montserrat-black",
-    alignSelf: "center",
-    paddingTop: 0
+    fontFamily: "montserrat-bold",
+    paddingTop: 0,
+    alignSelf: "flex-start",
+    minHeight: 20
   }
 });

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Icon } from "react-native-elements";
 import styled from "@emotion/native";
 import parse from "date-fns/parse";
 import format from "date-fns/format";
@@ -6,7 +7,7 @@ import formatDistance from "date-fns/formatDistance";
 
 import Colors from "../constants/Colors";
 import ActionBar from "./ActionBar";
-import Contacts from "./Contacts";
+import Notes from "./Notes";
 import Map from "./Map";
 import Weather from "./Weather";
 import Tasks from "./Tasks";
@@ -18,6 +19,7 @@ const EventCard = styled.View`
   flex: 1;
   border-radius: 4px;
   box-shadow: 1px 1px 1px ${Colors.shadow};
+  elevation: 2;
 `;
 
 const EventTitle = styled.Text`
@@ -54,8 +56,7 @@ const WeatherContainer = styled.View`
   margin-horizontal: -16px;
 `;
 
-const ContactsContainer = styled.View`
-  min-height: 50px;
+const NotesContainer = styled.View`
   border-top-width: 1px;
   border-top-color: ${Colors.borders};
   padding-horizontal: 16px;
@@ -64,6 +65,16 @@ const ContactsContainer = styled.View`
 const ActionBarContainer = styled.View`
   border-top-width: ${props => (props.hideBorder ? 0 : 1)};
   border-top-color: ${Colors.borders};
+`;
+
+const EventDetailButton = styled.View`
+  position: absolute;
+  width: 32px;
+  height: 32px;
+  top: 8px;
+  right: 8px;
+  justify-content: center;
+  align-items: center;
 `;
 
 const getDisplayDates = (startDate, endDate) => {
@@ -106,12 +117,15 @@ export default props => {
         <WeatherContainer>
           <Weather forecast={event.weather} />
         </WeatherContainer>
+        <EventDetailButton>
+          <Icon
+            name="arrow-right"
+            type="material-community"
+            size={24}
+            color={Colors.primary["700"]}
+          />
+        </EventDetailButton>
       </Summary>
-      {!!event.contacts.length && (
-        <ContactsContainer>
-          <Contacts contacts={event.contacts} />
-        </ContactsContainer>
-      )}
       <Map venue={event.venue} hotel={event.hotel} />
       <Tasks tasks={event.tasks.items} />
       <ActionBarContainer hideBorder={!!event.tasks.items.length}>

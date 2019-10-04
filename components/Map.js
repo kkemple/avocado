@@ -26,6 +26,7 @@ const CurrentMapLocation = styled.View`
   margin: 8px;
   padding-vertical: 8px;
   width: 100px;
+  elevation: 2;
 `;
 
 const CurrentMapLocationOption = styled.View`
@@ -52,6 +53,7 @@ const Control = styled.TouchableOpacity`
   justify-content: center;
   margin: 8px;
   width: 44px;
+  elevation: 2;
 `;
 
 const CurrentLocationButton = styled.TouchableOpacity`
